@@ -54,12 +54,12 @@ completion in this case.")
   ;; Only done with :tools vertico active due to orderless. Alternatively, we
   ;; could set it up here if it's not there.
   (when (and +corfu-want-multi-component (modulep! :completion vertico))
-    (if (not (modulep! :tools lsp))
-        (add-to-list 'completion-category-overrides (eglot (styles orderless)))
-      (defun doom--use-orderless-lsp-capf ()
-        (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
-              '(orderless)))
-      (add-hook 'lsp-completion-mode-hook #'doom--use-orderless-lsp-capf))))
+    (cond ((modulep! :tools lsp +eglot) (add-to-list 'completion-category-overrides '(eglot (styles orderless))))
+          ((modulep! :tools lsp)
+           (defun doom--use-orderless-lsp-capf ()
+             (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+                   '(orderless)))
+           (add-hook 'lsp-completion-mode-hook #'doom--use-orderless-lsp-capf)))))
 
 ;; Taken from corfu's README.
 ;; TODO: extend this to other completion front-ends, mainly helm and ido, since
