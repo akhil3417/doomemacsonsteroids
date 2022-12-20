@@ -35,9 +35,8 @@ completion in this case.")
 
   :config
   (when (and (modulep! :tools lsp) (not (modulep! :tools lsp +eglot)))
-    (defun doom--add-lsp-capf ()
-      (add-to-list 'completion-at-point-functions (cape-capf-buster #'lsp-completion-at-point)))
-    (add-hook 'lsp-mode-hook #'doom--add-lsp-capf))
+    (add-hook 'lsp-mode-hook (defun doom--add-lsp-capf ()
+                               (add-to-list 'completion-at-point-functions (cape-capf-buster #'lsp-completion-at-point)))))
   (add-to-list 'completion-styles 'partial-completion t)
   (add-to-list 'completion-styles 'initials t)
   (setq corfu-cycle t
@@ -55,11 +54,10 @@ completion in this case.")
   ;; could set it up here if it's not there.
   (when (and +corfu-want-multi-component (modulep! :completion vertico))
     (cond ((modulep! :tools lsp +eglot) (add-to-list 'completion-category-overrides '(eglot (styles orderless))))
-          ((modulep! :tools lsp)
-           (defun doom--use-orderless-lsp-capf ()
-             (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
-                   '(orderless)))
-           (add-hook 'lsp-completion-mode-hook #'doom--use-orderless-lsp-capf))))
+          ((modulep! :tools lsp) (add-hook 'lsp-completion-mode-hook
+                                           (defun doom--use-orderless-lsp-capf ()
+                                             (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+                                                   '(orderless)))))))
   (map! (:unless (modulep! +tng)
           :desc "complete" "C-SPC" #'completion-at-point)
         (:map 'corfu-map
