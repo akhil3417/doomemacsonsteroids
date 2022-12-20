@@ -48,9 +48,9 @@ completion in this case.")
         corfu-preview-current 'insert
         corfu-quit-at-boundary (if +corfu-want-multi-component 'separator t)
         corfu-quit-no-match (if +corfu-want-multi-component 'separator t)
-        ;; Causes TAB to be smart: on a line with messy indentation, indent;
-        ;;                         on a line with proper indentation, complete.
-        tab-always-indent 'complete)
+        ;; In the case of +tng, TAB should be smart regarding completion;
+        ;; However, it should otherwise behave like normal, whatever normal was.
+        tab-always-indent (if (modulep! +tng) 'complete tab-always-indent))
   ;; Only done with :tools vertico active due to orderless. Alternatively, we
   ;; could set it up here if it's not there.
   (when (and +corfu-want-multi-component (modulep! :completion vertico))
@@ -59,7 +59,21 @@ completion in this case.")
            (defun doom--use-orderless-lsp-capf ()
              (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
                    '(orderless)))
-           (add-hook 'lsp-completion-mode-hook #'doom--use-orderless-lsp-capf)))))
+           (add-hook 'lsp-completion-mode-hook #'doom--use-orderless-lsp-capf))))
+  (map! (:unless (modulep! +tng)
+          :desc "complete" "C-SPC" #'completion-at-point)
+        (:map 'corfu-map
+              (:when +corfu-want-multi-component
+                :desc "insert separator" "SPC" #'corfu-insert-separator)
+              (:when (modulep! :completion vertico)
+                :desc "move to minibuffer" "s-<down>" #'corfu-move-to-minibuffer
+                (:when (modulep! :editor evil)
+                  :desc "move to minibuffer" "s-j" #'corfu-move-to-minibuffer))
+              (:when (modulep! +tng)
+                :desc "next" [tab] #'corfu-next
+                :desc "previous" [backtab] #'corfu-previous
+                :desc "next" "TAB" #'corfu-next
+                :desc "previous" "S-TAB" #'corfu-previous))))
 
 ;; Taken from corfu's README.
 ;; TODO: extend this to other completion front-ends, mainly helm and ido, since
@@ -124,33 +138,16 @@ completion in this case.")
 (use-package! corfu-popupinfo
   :hook (corfu-mode . corfu-popupinfo-mode)
   :config
-  (setq corfu-popupinfo-delay '(0.5 . 1.0)))
-
-;;
-;;; Keybinds
-(map! :desc "scroll info up" "C-<up>" #'corfu-popupinfo-scroll-down
-      :desc "scroll info down" "C-<down>" #'corfu-popupinfo-scroll-up
-      :desc "scroll info up" "C-S-p" #'corfu-popupinfo-scroll-down
-      :desc "scroll info down" "C-S-n" #'corfu-popupinfo-scroll-up
-      :desc "toggle info" "C-h" #'corfu-popupinfo-toggle
-      (:when (modulep! +tng)
-        :desc "complete" :i [tab] #'completion-at-point
-        :desc "complete" :i "TAB" #'completion-at-point)
-      (:unless (modulep! +tng)
-        :desc "complete" :nvi "C-SPC" #'completion-at-point)
-      (:map 'corfu-map
-       (:when +corfu-want-multi-component
-         :desc "insert separator" "SPC" #'corfu-insert-separator)
-       (:when (modulep! :completion vertico)
-         :desc "move to minibuffer" "s-<down>" #'corfu-move-to-minibuffer
-         (:when (modulep! :editor evil)
-           :desc "move to minibuffer" "s-j" #'corfu-move-to-minibuffer))
-       (:when (modulep! +tng)
-         :desc "next" :i "TAB" #'corfu-next
-         :desc "previous" :i "S-TAB" #'corfu-previous))
-      (:map corfu-popupinfo-map
-        :when (modulep! :editor evil)
-        ;; Reversed because popupinfo assumes opposite of what feels intuitive
-        ;; with evil.
-        :desc "scroll info up" "C-S-k" #'corfu-popupinfo-scroll-down
-        :desc "scroll info down" "C-S-j" #'corfu-popupinfo-scroll-up))
+  (setq corfu-popupinfo-delay '(0.5 . 1.0))
+  (map! (:map 'corfu-map
+         :desc "scroll info up" "C-<up>" #'corfu-popupinfo-scroll-down
+         :desc "scroll info down" "C-<down>" #'corfu-popupinfo-scroll-up
+         :desc "scroll info up" "C-S-p" #'corfu-popupinfo-scroll-down
+         :desc "scroll info down" "C-S-n" #'corfu-popupinfo-scroll-up
+         :desc "toggle info" "C-h" #'corfu-popupinfo-toggle)
+        (:map 'corfu-popupinfo-map
+         :when (modulep! :editor evil)
+         ;; Reversed because popupinfo assumes opposite of what feels intuitive
+         ;; with evil.
+         :desc "scroll info up" "C-S-k" #'corfu-popupinfo-scroll-down
+         :desc "scroll info down" "C-S-j" #'corfu-popupinfo-scroll-up)))
