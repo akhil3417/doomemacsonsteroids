@@ -109,9 +109,6 @@ You should use `set-eshell-alias!' to change this.")
   ;; or configure `+eshell-aliases' via elisp.
   (advice-add #'eshell-write-aliases-list :override #'ignore)
 
-  (when (modulep! :completion corfu)
-    (add-hook 'eshell-mode-hook (hang-cape cape-history cape-symbol)))
-
   ;; REVIEW In Emacs 27 and newer, waiting for esh-module is unnecessary.
   (after! esh-module
     (add-to-list 'eshell-modules-list 'eshell-tramp))
