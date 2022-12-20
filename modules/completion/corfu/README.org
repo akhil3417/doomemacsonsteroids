@@ -4,11 +4,11 @@
 #+since:    2.0.9
 
 * Description :unfold:
-This module provides code completion, powered by [[https://github.com/minad/corfu][corfu]]. Either this or the
-[[../company/README.org][company-mode module]] needs to be active for the "intellisense" functionality
-provided by many of the [[doom-module:][:lang]] modules. Corfu is much lighter weight and focused,
-plus it's built on native Emacs functionality, whereas company is heavy and
-highly non-native, but has some extra features and more maturity.
+This module provides code completion, powered by [[https://github.com/minad/corfu][corfu]]. It is recommended to
+enable either this or [[doom-module:][:completion company]], in case you desire pre-configured
+auto-completion. Corfu is much lighter weight and focused, plus it's built on
+native Emacs functionality, whereas company is heavy and highly non-native, but
+has some extra features and more maturity.
 
 ** Maintainers
 - [[doom-user:][@LuigiPiucco]]
@@ -93,7 +93,7 @@ If the [[doom-module:][:completion vertico]] module is enabled, users can perfor
 with multiple search keywords by use of space as separator. More information can
 be found [[https://github.com/oantolin/orderless#company][here]]. Pressing [[kbd:][SPC]] when completing does not immediately stop
 completion, it goes until there are no matches or you manually back out of it.
-This allows searching with space separated terms; each piece will match
+This allows searching with space-separated terms; each piece will match
 individually and in any order, with smart casing.
 
 Without [[doom-module:][:completion vertico]], it still works, just not as intelligently, due to
