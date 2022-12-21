@@ -101,6 +101,15 @@ completion in this case.")
   (add-to-list 'completion-at-point-functions #'cape-file)
   (add-to-list 'completion-at-point-functions #'cape-dabbrev)
   (add-to-list 'completion-at-point-functions #'cape-keyword)
+  (add-hook 'emacs-lisp-mode-hook
+            (lambda ()
+              (add-to-list 'completion-at-point-functions #'cape-symbol)))
+  (add-hook! '(TeX-mode-hook LaTeX-mode-hook org-mode-hook)
+    (lambda ()
+      (add-to-list 'completion-at-point-functions #'cape-tex)))
+  (add-hook! '(html-mode-hook +web-react-mode-hook typescript-tsx-mode-hook org-mode-hook markdown-mode-hook)
+    (lambda ()
+      (add-to-list 'completion-at-point-functions #'cape-sgml)))
   :config
   ;; Enhances speed on large projects, for which many buffers may be open.
   (setq cape-dabbrev-check-other-buffers nil))
