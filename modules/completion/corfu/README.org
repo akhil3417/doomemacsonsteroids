@@ -75,7 +75,7 @@ is visible, the following relevant keys are available:
 | [[kbd:][s-<down>]] | Export to minibuffer (if [[doom-module:][:completion vertico]])        |
 | [[kbd:][s-j]]      | (evil) Export to minibuffer (if [[doom-module:][:completion vertico]]) |
 | [[kbd:][RET]]      | Insert candidate                                     |
-| [[kbd:][SPC]]      | (when completing) Insert separator (see below)       |
+| [[kbd:][C-SPC]]    | (when completing) Insert separator (see below)       |
 | [[kbd:][C-SPC]]    | Complete (unless [[doom-module:][:completion corfu +tng]])             |
 
 If you prefer a [[kbd:][TAB]]-centric completion style, enable the [[doom-module:][:completion corfu +tng]]
@@ -91,10 +91,11 @@ additional binds:
 ** Searching with multiple keywords
 If the [[doom-module:][:completion vertico]] module is enabled, users can perform code completion
 with multiple search keywords by use of space as separator. More information can
-be found [[https://github.com/oantolin/orderless#company][here]]. Pressing [[kbd:][SPC]] when completing does not immediately stop
-completion, it goes until there are no matches or you manually back out of it.
-This allows searching with space-separated terms; each piece will match
-individually and in any order, with smart casing.
+be found [[https://github.com/oantolin/orderless#company][here]]. Pressing [[kdb:][C-SPC]] again while completing inserts a space as
+separator. This allows searching with space-separated terms; each piece will
+match individually and in any order, with smart casing. Pressing just [[kbd:][SPC]] acts
+as normal and restarts completion, so that when typing sentences it doesn't try
+to complete the whole sentence instead of just the word.
 
 Without [[doom-module:][:completion vertico]], it still works, just not as intelligently, due to
 the lack of orderless.
@@ -116,6 +117,14 @@ A few variables may be set to change behavior of this module:
 - +corfu-want-multi-component ::
   Sets whether orderless-style matching should be supported with space as a
   separator.
+
+Additionally, if you prefer to never stop completion on [[kbd:][SPC]], add the following
+to your ~config.el~:
+
+#+begin_src emacs-lisp
+(map! :map corfu-map
+      :desc "insert separator" "C-SPC" #'corfu-insert-separator)
+#+end_src
 
 * Troubleshooting
 [[doom-report:][Report an issue?]]

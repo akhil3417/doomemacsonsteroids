@@ -62,7 +62,7 @@ completion in this case.")
           :desc "complete" "C-SPC" #'completion-at-point)
         (:map 'corfu-map
               (:when +corfu-want-multi-component
-                :desc "insert separator" "SPC" #'corfu-insert-separator)
+                :desc "insert separator" "C-SPC" #'corfu-insert-separator)
               (:when (modulep! :completion vertico)
                 :desc "move to minibuffer" "s-<down>" #'corfu-move-to-minibuffer
                 (:when (modulep! :editor evil)
