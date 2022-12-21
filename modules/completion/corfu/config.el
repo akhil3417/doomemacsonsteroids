@@ -18,6 +18,14 @@ This allows search of non-contiguous unordered bits, for instance by typing
 \"tear rip\" to match \"rip-and-tear\". Notice the space, it does not break
 completion in this case.")
 
+(defvar +corfu-ispell-completion-modes '(org-mode markdown-mode text-mode)
+  "Modes to enable ispell completion in.
+
+For completion in comments, see `+corfu-ispell-in-comments-and-strings'.")
+(defvar +corfu-ispell-in-comments-and-strings t
+  "Enable completion with ispell inside comments when in a `prog-mode'
+derivative.")
+
 ;;
 ;;; Packages
 (use-package! corfu
@@ -103,13 +111,36 @@ completion in this case.")
   (add-to-list 'completion-at-point-functions #'cape-keyword)
   (add-hook 'emacs-lisp-mode-hook
             (lambda ()
-              (add-to-list 'completion-at-point-functions #'cape-symbol)))
+              (add-to-list 'completion-at-point-functions #'cape-symbol t)))
   (add-hook! '(TeX-mode-hook LaTeX-mode-hook org-mode-hook)
     (lambda ()
-      (add-to-list 'completion-at-point-functions #'cape-tex)))
+      (add-to-list 'completion-at-point-functions #'cape-tex t)))
   (add-hook! '(html-mode-hook +web-react-mode-hook typescript-tsx-mode-hook org-mode-hook markdown-mode-hook)
     (lambda ()
-      (add-to-list 'completion-at-point-functions #'cape-sgml)))
+      (add-to-list 'completion-at-point-functions #'cape-sgml t)))
+  (dolist (sym +corfu-ispell-completion-modes)
+    (add-hook (intern (concat (symbol-name sym) "-hook"))
+              (lambda ()
+                (add-to-list 'completion-at-point-functions #'cape-ispell))))
+  (when +corfu-ispell-in-comments-and-strings
+    (defun corfu--ispell-in-comments-and-strings (&optional interactive)
+      "Call `cape-ispell', but only if in a comment or string (what the current
+mode consider to be a comment or string).
+
+Returns `nil' if not at the right place, otherwise whatever is returned from
+`cape-ispell', with the exception that this capf is exclusive, since you
+probably don't want programming completions in these contexts."
+      (interactive (list t))
+      (when (doom-point-in-string-or-comment-p)
+        (let ((fut (cape-ispell interactive))
+              past)
+          (while (not (eq (car fut) :exclusive))
+            (setq past (append past (list (car fut)))
+                  fut (cdr fut)))
+          `(,@past ,@(cddr fut))))))
+  (add-hook 'prog-mode-hook
+            (lambda ()
+              (add-to-list 'completion-at-point-functions #'corfu--ispell-in-comments-and-strings)))
   :config
   ;; Enhances speed on large projects, for which many buffers may be open.
   (setq cape-dabbrev-check-other-buffers nil))

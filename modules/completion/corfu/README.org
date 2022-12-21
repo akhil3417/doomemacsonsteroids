@@ -107,6 +107,12 @@ minibuffer, giving access to all the manipulations the vertico suite allows. For
 instance, one could use this to export with [[doom-package:][embark]] via [[kbd:][C-c C-l]] and get a buffer
 with all candidates.
 
+** Ispell completion
+Ispell completion is supported, so long as you point to the right ~.dic~ file in
+~ispell-alternate-dictionary~. For selected text modes (see the configuration
+section) it completes everywhere, for programming modes it can complete in
+comments and strings.
+
 * Configuration
 A few variables may be set to change behavior of this module:
 
@@ -117,6 +123,14 @@ A few variables may be set to change behavior of this module:
 - +corfu-want-multi-component ::
   Sets whether orderless-style matching should be supported with space as a
   separator.
+- +corfu-ispell-completion-modes ::
+  Lists modes in which to add ~cape-ispell~ as a capf. These show be majorly
+  text modes, else you will get lots of bad suggestions, since when this matches
+  it interrupts the flow of candidate selection.
+- +corfu-ispell-in-comments-and-strings ::
+  Whether we should complete when point is inside a string or comment. If
+  non-nil, works as in a text mode, else gives programming completions just like
+  in the rest of the buffer.
 
 Additionally, if you prefer to never stop completion on [[kbd:][SPC]], add the following
 to your ~config.el~:
