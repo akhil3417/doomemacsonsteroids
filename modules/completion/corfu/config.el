@@ -44,12 +44,14 @@ derivative.")
   :config
   (when (and (modulep! :tools lsp) (not (modulep! :tools lsp +eglot)))
     (add-hook 'lsp-mode-hook (defun doom--add-lsp-capf ()
-                               (add-to-list 'completion-at-point-functions (cape-capf-buster #'lsp-completion-at-point)))))
+                               (add-to-list 'completion-at-point-functions (cape-capf-buster #'lsp-completion-at-point)))
+              ;; Below is so that context specific completions in cape come first.
+              :depth 1))
   (add-to-list 'completion-styles 'partial-completion t)
   (add-to-list 'completion-styles 'initials t)
   (setq corfu-cycle t
         corfu-separator (when +corfu-want-multi-component ?\s)
-        corfu-preselect-first t
+        corfu-preselect t
         corfu-count 16
         corfu-max-width 120
         corfu-preview-current 'insert
@@ -107,40 +109,27 @@ derivative.")
              cape-line)
   :init
   (add-to-list 'completion-at-point-functions #'cape-file)
-  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-  (add-to-list 'completion-at-point-functions #'cape-keyword)
-  (add-hook 'emacs-lisp-mode-hook
-            (lambda ()
-              (add-to-list 'completion-at-point-functions #'cape-symbol t)))
-  (add-hook! '(TeX-mode-hook LaTeX-mode-hook org-mode-hook)
-    (lambda ()
-      (add-to-list 'completion-at-point-functions #'cape-tex t)))
-  (add-hook! '(html-mode-hook +web-react-mode-hook typescript-tsx-mode-hook org-mode-hook markdown-mode-hook)
-    (lambda ()
-      (add-to-list 'completion-at-point-functions #'cape-sgml t)))
+  (when +corfu-ispell-in-comments-and-strings
+    (defalias 'corfu--ispell-in-comments-and-strings
+      (cape-super-capf (cape-capf-inside-comment #'cape-ispell)
+                       (cape-capf-inside-string #'cape-ispell)))
+    (add-hook 'prog-mode-hook
+              (lambda ()
+                (add-to-list 'completion-at-point-functions #'corfu--ispell-in-comments-and-strings))))
   (dolist (sym +corfu-ispell-completion-modes)
     (add-hook (intern (concat (symbol-name sym) "-hook"))
               (lambda ()
                 (add-to-list 'completion-at-point-functions #'cape-ispell))))
-  (when +corfu-ispell-in-comments-and-strings
-    (defun corfu--ispell-in-comments-and-strings (&optional interactive)
-      "Call `cape-ispell', but only if in a comment or string (what the current
-mode consider to be a comment or string).
-
-Returns `nil' if not at the right place, otherwise whatever is returned from
-`cape-ispell', with the exception that this capf is exclusive, since you
-probably don't want programming completions in these contexts."
-      (interactive (list t))
-      (when (doom-point-in-string-or-comment-p)
-        (let ((fut (cape-ispell interactive))
-              past)
-          (while (not (eq (car fut) :exclusive))
-            (setq past (append past (list (car fut)))
-                  fut (cdr fut)))
-          `(,@past ,@(cddr fut))))))
-  (add-hook 'prog-mode-hook
-            (lambda ()
-              (add-to-list 'completion-at-point-functions #'corfu--ispell-in-comments-and-strings)))
+  (add-hook! '(TeX-mode-hook LaTeX-mode-hook org-mode-hook)
+    (lambda ()
+      (add-to-list 'completion-at-point-functions #'cape-tex t))
+    :depth 2)
+  (add-hook! '(html-mode-hook +web-react-mode-hook typescript-tsx-mode-hook org-mode-hook markdown-mode-hook)
+    (lambda ()
+      (add-to-list 'completion-at-point-functions #'cape-sgml t))
+    :depth 2)
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (add-to-list 'completion-at-point-functions #'cape-keyword)
   :config
   ;; Enhances speed on large projects, for which many buffers may be open.
   (setq cape-dabbrev-check-other-buffers nil))
