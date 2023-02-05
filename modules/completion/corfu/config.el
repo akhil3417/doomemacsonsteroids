@@ -17,6 +17,12 @@ Setting `corfu-auto-prefix' directly may not work, as it needs to be set
 This allows search of non-contiguous unordered bits, for instance by typing
 \"tear rip\" to match \"rip-and-tear\". Notice the space, it does not break
 completion in this case.")
+(defvar +corfu-icon-height 0.9
+  "The height applied to the icons (it is passed to both svg-lib and kind-icon).
+
+It may need tweaking for the completions to not become cropped at the end.
+Note that changes are applied only after a cache reset, via
+`kind-icon-reset-cache'.")
 
 (defvar +corfu-ispell-completion-modes '(org-mode markdown-mode text-mode)
   "Modes to enable ispell completion in.
@@ -142,7 +148,9 @@ derivative.")
   :config
   (setq kind-icon-default-face 'corfu-default
         kind-icon-blend-background t
-        kind-icon-blend-frac 0.2))
+        kind-icon-blend-frac 0.2)
+  (plist-put kind-icon-default-style :height +corfu-icon-height)
+  (plist-put svg-lib-style-default :height +corfu-icon-height))
 
 (use-package! corfu-terminal
   :when (and (modulep! :os tty) (not (display-graphic-p)))
