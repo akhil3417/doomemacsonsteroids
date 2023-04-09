@@ -24,14 +24,6 @@ It may need tweaking for the completions to not become cropped at the end.
 Note that changes are applied only after a cache reset, via
 `kind-icon-reset-cache'.")
 
-(defvar +corfu-ispell-completion-modes '(org-mode markdown-mode text-mode)
-  "Modes to enable ispell completion in.
-
-For completion in comments, see `+corfu-ispell-in-comments-and-strings'.")
-(defvar +corfu-ispell-in-comments-and-strings t
-  "Enable completion with ispell inside comments when in a `prog-mode'
-derivative.")
-
 ;;
 ;;; Packages
 (use-package! corfu
@@ -114,17 +106,6 @@ derivative.")
              cape-line)
   :init
   (add-to-list 'completion-at-point-functions #'cape-file)
-  (when +corfu-ispell-in-comments-and-strings
-    (defalias 'corfu--ispell-in-comments-and-strings
-      (cape-super-capf (cape-capf-inside-comment #'cape-dict)
-                       (cape-capf-inside-string #'cape-dict)))
-    (add-hook 'prog-mode-hook
-              (lambda ()
-                (add-to-list 'completion-at-point-functions #'corfu--ispell-in-comments-and-strings t))))
-  (dolist (sym +corfu-ispell-completion-modes)
-    (add-hook (intern (concat (symbol-name sym) "-hook"))
-              (lambda ()
-                (add-to-list 'completion-at-point-functions #'cape-dict t))))
   (add-hook! '(TeX-mode-hook LaTeX-mode-hook org-mode-hook)
     (lambda ()
       (add-to-list 'completion-at-point-functions #'cape-tex t))
