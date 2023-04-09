@@ -145,7 +145,9 @@
 (defun +org/return ()
   "Call `org-return' then indent (if `electric-indent-mode' is on)."
   (interactive)
-  (org-return electric-indent-mode))
+  (if (and (modulep! :completion corfu) corfu--frame (frame-visible-p corfu--frame))
+      (corfu-insert)
+    (org-return electric-indent-mode)))
 
 ;;;###autoload
 (defun +org/dwim-at-point (&optional arg)
