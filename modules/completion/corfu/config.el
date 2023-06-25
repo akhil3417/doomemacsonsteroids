@@ -105,20 +105,7 @@ Note that changes are applied only after a cache reset, via
              cape-symbol
              cape-line)
   :init
-  (add-to-list 'completion-at-point-functions #'cape-file)
-  (add-hook! '(TeX-mode-hook LaTeX-mode-hook org-mode-hook)
-    (lambda ()
-      (add-to-list 'completion-at-point-functions #'cape-tex t))
-    :depth 2)
-  (add-hook! '(html-mode-hook +web-react-mode-hook typescript-tsx-mode-hook org-mode-hook markdown-mode-hook)
-    (lambda ()
-      (add-to-list 'completion-at-point-functions #'cape-sgml t))
-    :depth 2)
-  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-  (add-to-list 'completion-at-point-functions #'cape-keyword)
-  :config
-  ;; Enhances speed on large projects, for which many buffers may be open.
-  (setq cape-dabbrev-check-other-buffers nil))
+  (add-to-list 'completion-at-point-functions #'cape-file))
 
 (use-package! kind-icon
   :when (modulep! +icons)
@@ -135,10 +122,6 @@ Note that changes are applied only after a cache reset, via
 (use-package! corfu-terminal
   :when (and (modulep! :os tty) (not (display-graphic-p)))
   :hook (corfu-mode . corfu-terminal-mode))
-
-(use-package! dabbrev
-  :config
-  (setq dabbrev-ignored-buffer-regexps '("\\.\\(?:pdf\\|jpe?g\\|png\\)\\'")))
 
 (setq read-extended-command-predicate
       #'command-completion-default-include-p)
