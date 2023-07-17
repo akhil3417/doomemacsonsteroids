@@ -116,6 +116,8 @@
     ;;       bumper fails to distinguish between org-roam v1 and v2.
     :recipe (:host github :repo "org-roam/org-roam")
     :pin "74422df546a515bc984c2f3d3a681c09d6f43916")))
+(when (featurep! +notify)
+  (package! org-wild-notifier :pin "4b1d874aafdee90815136c308f1f3bd3577971ec"))
 
 ;;; Babel
 (package! ob-async :pin "9aac486073f5c356ada20e716571be33a350a982")
