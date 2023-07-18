@@ -114,6 +114,8 @@
   (map! :map dirvish-mode-map
         :n  "?"   #'dirvish-dispatch
         :n  "q"   #'dirvish-quit
+        :n  "h"   #'dired-up-directory
+        :n  "l"   #'dired-find-file
         :ng "a"   #'dirvish-quick-access
         :ng "f"   #'dirvish-file-info-menu
         :ng "y"   #'dirvish-yank-menu
