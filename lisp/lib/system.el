@@ -31,10 +31,10 @@
         (format "Windows %s" "Unknown")) ; TODO
        ((eq distro 'macos)
         (format "MacOS %s" (sh "sw_vers" "-productVersion")))
-       ((executable-find "lsb_release")
-        (sh "lsb_release" "-s" "-d"))
        ((executable-find "nixos-version")
         (format "NixOS %s" (sh "nixos-version")))
+       ((executable-find "lsb_release")
+        (sh "lsb_release" "-s" "-d"))
        ((ignore-errors
           (with-file-contents! "/etc/os-release"
             (when (re-search-forward "^PRETTY_NAME=\"?\\([^\"\n]+\\)\"?" nil t)
@@ -82,6 +82,7 @@
 (defun doom-system-cpus ()
   "Return the max number of processing units on this system.
 Tries to be portable. Returns 1 if cannot be determined."
+  ;; REVIEW: Replace with `num-processors' once 27.x support is dropped.
   (with-memoization (get 'doom-system-cpus 'cached-value)
     (if (fboundp 'num-processors)
         (num-processors) ; added in Emacs 28.1

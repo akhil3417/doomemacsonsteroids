@@ -64,9 +64,10 @@
 ;; offensive) optimizations, and load the minimum for all Doom sessions.
 ;;
 ;;; Code:
+
+;; For `when-let' and `if-let' on versions of Emacs before they were autoloaded.
 (eval-when-compile (require 'subr-x))
 
-;;; Version checks
 (eval-and-compile  ; Check version at both compile and runtime.
   ;; Doom's minimum supported version of Emacs is 27.1. Its my goal to support
   ;; one major version below the stable release, for about a year or until
@@ -107,12 +108,17 @@
                 emacs-version old-version)))
 
 ;;; Custom features
-;; Since `system-configuration-features's docs state not to rely on it to test
-;; for features, let's give users an easier way to detect them.
+;; Emacs needs a more consistent way to detect build features, and the docs
+;; claim `system-configuration-features' is not da way. Some features (that
+;; don't represent packages) can be found in `features' (which `featurep'
+;; consults), but aren't consistent, so I'll impose some consistency:
 (if (bound-and-true-p module-file-suffix)
     (push 'dynamic-modules features))
 (if (fboundp #'json-parse-string)
     (push 'jansson features))
+(let ((inhibit-changing-match-data t))
+  (if (string-match "HARFBUZZ" system-configuration-features) ; no alternative
+      (push 'harfbuzz features)))
 ;; `native-compile' exists whether or not it is functional (e.g. libgcc is
 ;; available or not). This seems silly, so pretend it doesn't exist if it
 ;; isn't available.
@@ -155,7 +161,8 @@
 
 (defgroup doom nil
   "An Emacs framework for the stubborn martian hacker."
-  :link '(url-link "https://doomemacs.org"))
+  :link '(url-link "https://doomemacs.org")
+  :group 'emacs)
 
 (defconst doom-version "3.0.0-pre"
   "Current version of Doom Emacs core.")
@@ -672,7 +679,7 @@ but long before your modules and $DOOMDIR/config.el are loaded."
 (defcustom doom-after-init-hook ()
   "A hook run once Doom's core and modules, and the user's config are loaded.
 
-This triggers at the absolutel atest point in the eager startup process, and
+This triggers at the absolute latest point in the eager startup process, and
 runs in both interactive and non-interactive sessions, so guard hooks
 appropriately against `noninteractive' or the `cli' context."
   :group 'doom
