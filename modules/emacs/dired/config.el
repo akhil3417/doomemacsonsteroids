@@ -11,6 +11,8 @@
         dired-recursive-deletes 'top
         ;; Ask whether destination dirs should get created when copying/removing files.
         dired-create-destination-dirs 'ask
+        ;; send deleted files to trash
+        delete-by-moving-to-trash t
         ;; Where to store image caches
         image-dired-dir (concat doom-cache-dir "image-dired/")
         image-dired-db-file (concat image-dired-dir "db.el")
