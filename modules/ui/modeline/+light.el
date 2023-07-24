@@ -585,8 +585,8 @@ lines are selected, or the NxM dimensions of a block selection.")
 ;;
 ;;; Bootstrap
 
-(if (and (featurep! +light)
-         (not (featurep! +headerline)))
+(if (and (modulep! +light)
+         (not (modulep! +headerline)))
     (progn
       (defvar +modeline--old-format (default-value 'mode-line-format))
       (define-minor-mode +modeline-mode
@@ -612,7 +612,7 @@ lines are selected, or the NxM dimensions of a block selection.")
       (add-hook '+modeline-global-mode-hook #'size-indication-mode)
       (add-hook 'doom-init-ui-hook #'+modeline-global-mode)))
 
-(if (featurep! +headerline)
+(if (modulep! +headerline)
     (progn
       (defvar +headerline--old-format (default-value 'header-line-format))
       (define-minor-mode +headerline-mode
