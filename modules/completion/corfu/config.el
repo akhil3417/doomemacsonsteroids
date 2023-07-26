@@ -91,6 +91,14 @@
       (add-to-list 'completion-at-point-functions #'cape-elisp-block)))
   (advice-add #'lsp-completion-at-point :around #'cape-wrap-noninterruptible))
 
+(use-package! yasnippet-capf
+  :when (modulep! :editor snippets)
+  :defer t
+  :init
+  (add-hook! 'yas-minor-mode-hook
+    (defun +corfu-add-yasnippet-capf-h ()
+      (add-hook 'completion-at-point-functions #'yasnippet-capf 30 t))))
+
 (use-package! corfu-terminal
   :when (not (display-graphic-p))
   :hook ((corfu-mode . corfu-terminal-mode)))
