@@ -187,6 +187,7 @@
        :app
        ;;calendar
        ;;emms
+       ;;mpc
        ;;everywhere        ; *leave* Emacs!? You must be joking
        ;;irc               ; how neckbeards socialize
        ;;(rss +org)        ; emacs as an RSS reader
