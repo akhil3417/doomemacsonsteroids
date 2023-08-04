@@ -331,23 +331,23 @@ orderless."
 ;; a new mpv process to play the video file instead of opening it in
 ;; a text buffer.
 
-(defvar ak/media-player "mpv"
-  "The media player to open media files.")
+;; (defvar ak/media-player "mpv"
+;;   "The media player to open media files.")
 
-(defvar ak/media-players
-  (cl-loop for ext in '("mp4" "mkv" "webm" "avi" "flv" "mov" "wmv" "m4b""mp3" "opus" "wav" "ogg")
-           collect (cons ext ak/media-player)))
+;; (defvar ak/media-players
+;;   (cl-loop for ext in '("mp4" "mkv" "webm" "avi" "flv" "mov" "wmv" "m4b""mp3" "opus" "wav" "ogg")
+;;            collect (cons ext ak/media-player)))
 
-(defun ak/find-file-handler (orig-fun &rest args)
-  "Open media files with the associated media player based on file extension."
-  (let ((file (expand-file-name (car args))))
-    (if (and (stringp file)
-             (file-regular-p file))
-        (let* ((file-ext (downcase (file-name-extension file)))
-               (media-player (cdr (assoc file-ext ak/media-players))))
-          (if media-player
-              (start-process "ak/file-handler" nil media-player file)
-            (apply orig-fun args)))
-      (apply orig-fun args))))
+;; (defun ak/find-file-handler (orig-fun &rest args)
+;;   "Open media files with the associated media player based on file extension."
+;;   (let ((file (expand-file-name (car args))))
+;;     (if (and (stringp file)
+;;              (file-regular-p file))
+;;         (let* ((file-ext (downcase (file-name-extension file)))
+;;                (media-player (cdr (assoc file-ext ak/media-players))))
+;;           (if media-player
+;;               (start-process "ak/file-handler" nil media-player file)
+;;             (apply orig-fun args)))
+;;       (apply orig-fun args))))
 
-(advice-add #'find-file :around #'ak/find-file-handler)
+;; (advice-add #'find-file :around #'ak/find-file-handler)
