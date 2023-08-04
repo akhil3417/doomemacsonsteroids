@@ -12,7 +12,6 @@ server and [[https://musicpd.org/clients/mpc/][mpc]] to update your music databa
 
 ** Module flags
 /This module has no flags./
-
 ** Packages
 - [[doom-package:emms]]
 
