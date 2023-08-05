@@ -54,9 +54,9 @@
  _d_: inc        _n_: next         _S_: single     [% s(+tick-symbol +mpc-single)]     _t_oggle modeline
  _o_: dec        _c_: prev         _r_: repeat     [% s(+tick-symbol +mpc-repeat)]     _T_oggle only time
  _v_: sysvol     _a_: seek bw      _#_: shuffle            _s_elect
- _D_: sysvol+    _h_: seek fw      _%_: sort               _g_oto EMMS buffer
- _O_: sysvol-    _SPC_: play/pause _m_: mute/unmute       _i_yrics
- ^ ^             _DEL_: restart                            _L_yrics select
+ _D_: sysvol+    _h_: seek fw      _%_: sort               _g_oto mpc buffer
+ _O_: sysvol-    _SPC_: play/pause _m_: mute/unmute
+ ^ ^             _DEL_: restart
   "
   ("d" simple-mpc-increase-volume)
   ("o" simple-mpc-decrease-volume)
