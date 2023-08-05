@@ -115,3 +115,15 @@ consider whole buffer."
              (cur (if (floatp cur) cur 1.0)))
         (set-face-attribute 'shr-text nil :height (- cur 0.1)))
     (text-scale-decrease 0.5)))
+
+;;;###autoload
+(defun +open-link-with-mpv ()
+  "Open the link under the point using mpv."
+  (interactive)
+  (save-excursion
+    (let (url)
+      (when (or (thing-at-point-looking-at "\\(https?\\):\\/\\/[^[:space:]]+")
+                (thing-at-point-looking-at "\\(ftp\\):\\/\\/[^[:space:]]+"))
+        (setq url (match-string-no-properties 0)))
+      (when url
+        (start-process "mpv" nil "mpv" url)))))
