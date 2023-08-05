@@ -7,34 +7,31 @@
 
 (use-package! simple-mpc
   :config
-  (defun +mpc-bindings ()
-    (interactive)
-    (evil-normal-state)
-    (evil-local-set-key 'normal (kbd "n") 'simple-mpc-next)
-    (evil-local-set-key 'normal (kbd "p") 'simple-mpc-prev)
-    (evil-local-set-key 'normal (kbd "r") 'simple-mpc-toggle-repeat)
-    (evil-local-set-key 'normal (kbd "C") 'simple-mpc-clear-current-playlist)
-    (evil-local-set-key 'normal (kbd "c") 'simple-mpc-view-current-playlist)
-    (evil-local-set-key 'normal (kbd "d") '+delete-mpc-item-without-losing-place)
-    (evil-local-set-key 'normal (kbd "D") '+mpd-remove-dupes)
-    (evil-local-set-key 'normal (kbd "s") 'simple-mpc-query)
-    (evil-local-set-key 'normal (kbd "S") 'simple-mpc-shuffle-current-playlist)
-    (evil-local-set-key 'normal (kbd "t") 'simple-mpc-toggle)
-    ;; (evil-local-set-key 'normal (kbd "SPC" 'simple-mpc-toggle)
-    (evil-local-set-key 'normal (kbd "L") 'simple-mpc-load-playlist)
-    (evil-local-set-key 'normal (kbd "a") 'simple-mpc-seek-backward)
-    (evil-local-set-key 'normal (kbd "h") 'simple-mpc-seek-forward)
-    (evil-local-set-key 'normal (kbd "P") '+save-playlist)
-    (evil-local-set-key 'normal (kbd "J") '+mpc-shift-down)
-    (evil-local-set-key 'normal (kbd "K") '+mpc-shift-up)
-    (evil-local-set-key 'normal (kbd "e") '+evil-select-all)
-    (evil-local-set-key 'normal (kbd "E") '+mpc-add-everything)
-    (evil-local-set-key 'normal (kbd "T") 'hydra-mpc/body))
+    (evil-define-key 'normal simple-mpc-mode-map
+      "n" 'simple-mpc-next
+      "p" 'simple-mpc-prev
+      "r" 'simple-mpc-toggle-repeat
+      "C" 'simple-mpc-clear-current-playlist
+      "c" 'simple-mpc-view-current-playlist
+      "d" '+delete-mpc-item-without-losing-place
+      "D" '+mpd-remove-dupes
+      "s" 'simple-mpc-query
+      "S" 'simple-mpc-shuffle-current-playlist
+      "t" 'simple-mpc-toggle
+      ;; bd "SPC" 'simple-mpc-toggle
+      "L" 'simple-mpc-load-playlist
+      "a" 'simple-mpc-seek-backward
+      "h" 'simple-mpc-seek-forward
+      "P" '+save-playlist
+      "J" '+mpc-shift-down
+      "K" '+mpc-shift-up
+      "e" '+evil-select-all
+      "E" '+mpc-add-everything
+      "T" 'hydra-mpc/body)
 
   (add-hook 'simple-mpc-mode-hook
             (lambda ()
-              (+mpd-start)
-              (+mpc-bindings)))
+              (+mpd-start)))
 
   (map! :leader
         (:prefix ("y" . "Audio players")
