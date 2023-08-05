@@ -66,8 +66,8 @@
   ("v" +set-volume)
   ("n" simple-mpc-next)
   ("c" simple-mpc-prev) ;;blame my keyboard layout for not being mnemonic
-  ("a" simple-mpc-seek-forward)
-  ("h" simple-mpc-seek-backward)
+  ("h" simple-mpc-seek-forward)
+  ("a" simple-mpc-seek-backward)
   ("SPC" simple-mpc-toggle)
   ("DEL" (simple-mpc-seek-internal(- 1000)));; yeah i know
   ("<backspace>" (simple-mpc-seek-internal(- 1000)));; yeah i know
