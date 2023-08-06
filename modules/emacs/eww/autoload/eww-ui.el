@@ -205,7 +205,19 @@ Return the exit code and output in a list."
   (eww-open-in-new-buffer))
 
 ;;;###autoload
+(defun +eww-search-in-other-window ()
+  "Use `eww-open-in-new-buffer' in another window."
   (interactive)
+  (other-window-prefix)       ; For emacs28 -- it's a hack, but why not?
+  (eww-search-words))
+
+;;;###autoload
+(defun +open-link-at-point-in-external-browser ()
+  (interactive)
+  (link-hint-copy-link-at-point)
+  (let ((url (current-kill 0)))
+    (browse-url-generic url)))
+
 ;;;###autoload
 (defun +default-browser-eww()
   "Set eww to be default browser."
