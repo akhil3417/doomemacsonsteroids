@@ -85,6 +85,57 @@ consider whole buffer."
       (recenter))))
 
 ;;;###autoload
+(defun +eww-visit-url-on-page (&optional arg)
+  "Visit URL from list of links on the page using completion.
+
+With optional prefix ARG (\\[universal-argument]) open URL in a
+new EWW buffer."
+  (interactive "P")
+  (when (derived-mode-p 'eww-mode)
+    (let* ((links (eww--capture-url-on-page))
+           (selection (completing-read "Browse URL from page: " links nil t))
+           (url (replace-regexp-in-string ".*@ " "" selection)))
+      (eww url (when arg 4)))))
+
+;;;###autoload
+(defun +eww-browse-dwim (url &optional arg)
+  "Visit a URL, maybe from `eww-prompt-history', with completion.
+
+With optional prefix ARG (\\[universal-argument]) open URL in a
+new eww buffer.  If URL does not look like a valid link, run a
+web query using `eww-search-prefix'.
+
+When called from an eww buffer, provide the current link as
+\\<minibuffer-local-map>\\[next-history-element]."
+  (interactive
+   (let ((all-history (delete-dups
+                       (append  eww-prompt-history)))
+         (current-url (eww-current-url)))
+     (list
+      (completing-read "Run EWW on: " all-history
+                       nil nil current-url 'eww-prompt-history current-url)
+      (prefix-numeric-value current-prefix-arg))))
+  (eww url arg))
+
+;; TODO fix
+;;;###autoload
+(defun +eww-visit-bookmark (&optional arg)
+  "Visit bookmarked URL.
+
+With optional prefix ARG (\\[universal-argument]) open URL in a
+new EWW buffer."
+  (interactive "P")
+  (eww-read-bookmarks)
+  (let ((list (gensym)))
+    (dolist (bookmark eww-bookmarks)
+      (push (plist-get bookmark :url) list))
+    (if eww-bookmarks
+        (eww (completing-read "Visit EWW bookmark: " list)
+        ;; (eww (ivy-completing-read "Visit EWW bookmark: " list) ;use ivy completion instead for this function
+             (when arg 4))
+      (user-error "No bookmarks"))))
+
+;;;###autoload
 (defun +eww-open-in-other-window ()
   "Use `eww-open-in-new-buffer' in another window."
   (interactive)
@@ -92,12 +143,7 @@ consider whole buffer."
   (eww-open-in-new-buffer))
 
 ;;;###autoload
-(defun +eww-search-in-other-window ()
-  "Use `eww-open-in-new-buffer' in another window."
   (interactive)
-  (other-window-prefix)       ; For emacs28 -- it's a hack, but why not?
-  (eww-search-words))
-
 ;;;###autoload
 (defun +default-browser-eww()
   "Set eww to be default browser."
