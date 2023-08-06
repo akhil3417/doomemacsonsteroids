@@ -1,6 +1,8 @@
 ;;; emacs/eww/autoload/language-detection.el -*- lexical-binding: t; -*-
 ;;;###if (modulep! +langdetect)
 
+(require 'cl-lib)
+
 ;;;###autoload
 (defun eww-tag-pre (dom)
   (let ((shr-folding-mode 'none)
@@ -8,6 +10,7 @@
     (shr-ensure-newline)
     (insert (eww-fontify-pre dom))
     (shr-ensure-newline)))
+
 
 (defun eww-fontify-pre (dom)
   (with-temp-buffer
@@ -17,13 +20,14 @@
         (eww-fontify-buffer mode)))
     (buffer-string)))
 
+
 (defun eww-fontify-buffer (mode)
   (delay-mode-hooks (funcall mode))
   (font-lock-default-function mode)
   (font-lock-default-fontify-region (point-min)
                                     (point-max)
                                     nil))
-
+;;;###autoload
 (defun eww-buffer-auto-detect-mode ()
   (let* ((map '((ada ada-mode)
                 (awk awk-mode)
@@ -75,5 +79,5 @@
       mode)))
 
 ;;;###autoload
-(setq shr-external-rendering-functions
-      '((pre . eww-tag-pre)))
+  (setq shr-external-rendering-functions
+        '((pre . eww-tag-pre)))
