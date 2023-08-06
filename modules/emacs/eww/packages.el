@@ -3,6 +3,6 @@
 
 (package! eww :built-in t)
 (when (modulep! +engine)
-      package! engine-mode)
-(when (modulep! +langdetec)
-      package! language-detection)
+      (package! engine-mode))
+(when (modulep! +langdetect)
+      (package! language-detection))
