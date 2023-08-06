@@ -38,6 +38,8 @@
         :n "gb" #'eww-list-bookmarks
         :n "S" #'+eww-search-in-other-window
         :n "o"  #'eww-search-words
+        :n "C"  #'eww-toggle-colors
+        :n "F"  #'eww-toggle-fonts
         :n "O"  #'+eww-visit-bookmark
         :n "m"  #'+eww-bookmark-page
         :n "D"  #'+eww-download-html
@@ -47,17 +49,8 @@
         :n "M"  #'browse-url-at-point-umpv
         :n "f" #'+eww-jump-to-url-on-page
         :n "C-f" #'+eww-visit-url-on-page
-        [remap imenu] #'+eww-jump-to-url-on-page
+        [remap imenu] #'+eww-jump-to-url-on-page)
 
-        (:localleader
-         :desc "external browser" "e" #'eww-browse-with-external-browser
-         :desc "buffers" "b" #'eww-switch-to-buffer
-
-         (:prefix ("t" . "toggle")
-          :desc "readable" "r" #'eww-readable
-          :desc "colors" "c" #'eww-toggle-colors
-          :desc "fonts" "f" #'eww-toggle-fonts
-          :desc "images" "i" #'eww-toggle-images))))
 
   ;; (map! :map eww-mode-map ;TODO add yank and kill history
 
