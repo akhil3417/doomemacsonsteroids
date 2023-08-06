@@ -8,7 +8,16 @@
     :after #'eww-back-url
     :after #'eww-forward-url
     (eww--rename-buffer))
-  (setq eww-history-limit 150)
+  (setq eww-history-limit 150
+        eww-restore-desktop t
+        eww-desktop-remove-duplicates t
+        eww-header-line-format nil
+        eww-search-prefix "https://duckduckgo.com/html/?q="
+        eww-browse-url-new-window-is-tab nil
+        eww-form-checkbox-selected-symbol "[X]"
+        eww-form-checkbox-symbol "[ ]"
+        eww-retrieve-command nil) ;; NOTE set to 'nil in case it messes up with paragraph spacing
+        ;; eww-retrieve-command '("wget" "--quiet" "--output-document=-")) ;; NOTE set to 'nil in case it messes up with paragraph spacing
 
   (map! :map eww-mode-map
         :ni "C-<return>" #'+eww-open-in-other-window
