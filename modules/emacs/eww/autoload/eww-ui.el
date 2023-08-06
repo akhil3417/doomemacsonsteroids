@@ -97,6 +97,26 @@ consider whole buffer."
   (let ((url (eww-current-url)))
     (kill-new url)
     (message url)))
+;;;###autoload
+(defun +default-browser-eww()
+  "Set eww to be default browser."
+  (interactive)
+  (setq engine/browser-function 'eww-browse-url;;  browse-url-default-browser open firefox
+       browse-url-browser-function 'eww-browse-url
+        browse-url-secondary-browser-function 'browse-url-generic))
+
+;;;###autoload
+(defun +default-browser-qutebrowser()
+  (interactive)
+  (setq engine/browser-function 'browse-url-generic;;  browse-url-default-browser open firefox
+        browse-url-browser-function 'browse-url-generic))
+
+;;;###autoload
+(defun +default-browser-firefox()
+  (interactive)
+  (setq engine/browser-function 'browse-url-default-browser;;  browse-url-default-browser open firefox
+        browse-url-browser-function 'browse-url-default-browser))
+
 
 ;;;###autoload
 (defun +eww-increase-font-size ()
