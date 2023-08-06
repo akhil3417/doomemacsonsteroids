@@ -135,6 +135,68 @@ new EWW buffer."
              (when arg 4))
       (user-error "No bookmarks"))))
 
+
+;;;###autoload
+(defun +eww-bookmark-page (title)
+  "Add eww bookmark named with TITLE."
+  (interactive
+   (list
+    (read-string "Set bookmark title: " (plist-get eww-data :title))))
+  (plist-put eww-data :title title)
+  (eww-add-bookmark))
+
+
+(defvar +eww--punctuation-regexp "[][{}!@#$%^&*()_=+'\"?,.\|;:~`‘’“”]*"
+  "Regular expression of punctionation that should be removed.")
+
+(defun +eww--slug-no-punct (str)
+  "Convert STR to a file name slug."
+  (replace-regexp-in-string +eww--punctuation-regexp "" str))
+
+(defun +eww--slug-hyphenate (str)
+  "Replace spaces with hyphens in STR.
+Also replace multiple hyphens with a single one and remove any
+trailing hyphen."
+  (replace-regexp-in-string
+   "-$" ""
+   (replace-regexp-in-string
+    "-\\{2,\\}" "-"
+    (replace-regexp-in-string "--+\\|\s+" "-" str))))
+
+(defun +eww--sluggify (str)
+  "Make STR an appropriate file name slug."
+  (downcase (+eww--slug-hyphenate (+eww--slug-no-punct str))))
+
+
+;; The `+common-shell-command-with-exit-code-and-output' function is
+;; courtesy of Harold Carr, who also sent a patch that improved
+;; `+eww-download-html' (from the `eww.el' library).
+;;
+;; More about Harold: <http://haroldcarr.com/about/>.
+(defun +common-shell-command-with-exit-code-and-output (command &rest args)
+  "Run COMMAND with ARGS.
+Return the exit code and output in a list."
+  (with-temp-buffer
+    (list (apply 'call-process command nil (current-buffer) nil args)
+          (buffer-string))))
+
+;;;###autoload
+(defun +eww-download-html (name)
+  "Download web page and call the file with NAME."
+  (interactive
+   (list
+    (+eww--sluggify
+     (read-string "Set downloaded file name: " (plist-get eww-data :title)))))
+  (let* ((path (thread-last eww-download-directory
+                 (expand-file-name
+                  (concat (format-time-string "%Y%m%d_%H%M%S") "--" name ".html"))))
+         (out (+common-shell-command-with-exit-code-and-output
+               "wget" "-q" (format "%s" (plist-get eww-data :url))
+               "-O" (format "%s" (shell-quote-argument path)))))
+    (if (= (car out) 0)
+        (message "Downloaded page at %s" path)
+      (message "Error downloading page: %s" (cdr out)))))
+
 ;;;###autoload
 (defun +eww-open-in-other-window ()
   "Use `eww-open-in-new-buffer' in another window."
