@@ -4,6 +4,8 @@
   :commands (eww)
   :config
   (add-hook! 'eww-after-render-hook #'eww--rename-buffer)
+  (when (featurep! +shrface)
+  (add-hook 'eww-after-render-hook #'shrface-mode))
   (defadvice! eww-rename-buffer-a ()
     :after #'eww-back-url
     :after #'eww-forward-url
@@ -58,6 +60,29 @@
           :desc "images" "i" #'eww-toggle-images))))
 
   ;; (map! :map eww-mode-map ;TODO add yank and kill history
+
+  (when (modulep! +shrface)
+    (require 'shrface)
+    (use-package shrface
+      :defer t
+      :config
+      (shrface-basic)
+      (shrface-trial)
+      (shrface-default-keybindings) ; setup default keybindings
+      (setq shrface-bullets-bullet-list '("◉" "○" "✸" "✿" "✤" "✜" "◆" "▶"))
+      (setq shrface-href-versatile t)
+    (map! :map eww-mode-map
+          :ni "<tab>"   #'shrface-outline-cycle
+          :n "S-<tab>"  #'shrface-outline-cycle-buffer
+          :n "C-t"      #'shrface-toggle-bullets
+          :n "C-n"      #'shrface-next-headline
+          :n "C-p"      #'shrface-previous-headline
+          :n "M-l"      #'shrface-links-consult  ; or 'shrface-links-helm or 'shrface-links-consult
+          :n "M-h"      #'shrface-headline-consult)))  ; or 'shrface-headline-helm or 'shrface-headline-consult
+
+  (when (modulep! +highlight)
+    (require 'shr-tag-pre-highlight)
+    (add-to-list 'shr-external-rendering-functions '(pre . shrface-shr-tag-pre-highlight))))
 
 (use-package! goto-addr
   :config

@@ -6,3 +6,7 @@
       (package! engine-mode))
 (when (modulep! +langdetect)
       (package! language-detection))
+(when (modulep! +shrface)
+      (package! shrface))
+(when (modulep! +highlight)
+      (package! shr-tag-pre-highlight))
