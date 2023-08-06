@@ -92,11 +92,12 @@ consider whole buffer."
   (eww-open-in-new-buffer))
 
 ;;;###autoload
-(defun +eww-copy-current-url ()
+(defun +eww-search-in-other-window ()
+  "Use `eww-open-in-new-buffer' in another window."
   (interactive)
-  (let ((url (eww-current-url)))
-    (kill-new url)
-    (message url)))
+  (other-window-prefix)       ; For emacs28 -- it's a hack, but why not?
+  (eww-search-words))
+
 ;;;###autoload
 (defun +default-browser-eww()
   "Set eww to be default browser."
