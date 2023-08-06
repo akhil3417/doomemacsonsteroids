@@ -30,6 +30,10 @@
         :n "H"  #'eww-back-url
         :n "L"  #'eww-forward-url
         :n "r"  #'eww-reload
+<<<<<<< HEAD
+=======
+        :n "I"  #'+eww-toogle-images
+>>>>>>> feature-eww
         :n "gt" #'eww-switch-to-buffer
         :n "gT" #'eww-list-buffers
         :n "gb" #'eww-list-bookmarks

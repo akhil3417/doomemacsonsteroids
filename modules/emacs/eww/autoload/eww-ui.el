@@ -198,6 +198,18 @@ Return the exit code and output in a list."
       (message "Error downloading page: %s" (cdr out)))))
 
 ;;;###autoload
+<<<<<<< HEAD
+=======
+(defun +eww-toggle-images ()
+  "Toggle whether images are loaded and reload the current page fro cache."
+  (interactive)
+  (setq-local shr-inhibit-images (not shr-inhibit-images))
+  (eww-reload t)
+  (message "Images are now %s"
+           (if shr-inhibit-images "off" "on")))
+
+;;;###autoload
+>>>>>>> feature-eww
 (defun +eww-open-in-other-window ()
   "Use `eww-open-in-new-buffer' in another window."
   (interactive)
