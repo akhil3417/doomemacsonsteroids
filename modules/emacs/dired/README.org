@@ -86,7 +86,9 @@ keybindings.
 | Keybind           | Description                        |
 |-------------------+------------------------------------|
 | [[kbd:][SPC f d]] | Find directory with dired          |
+| [[kbd:][SPC f q]] | Dirvish quick access |
 | [[kbd:][SPC o -]] | Jump to current directory in dired |
+| [[kbd:][SPC t d]] | Toggle dirvish sidebar             |
 
 These commands are available but not bound to any keys.
 
@@ -101,8 +103,8 @@ These commands are available but not bound to any keys.
 *** Basics
 | Keybind                     | Description                               |
 |-----------------------------+-------------------------------------------|
-| [[kbd:][l]]                | Move up a directory or equivalent to RET.  |
-| [[kbd:][h]]                | Move down a directory             |
+| [[kbd:][l]]                 | Move up a directory or equivalent to RET. |
+| [[kbd:][h]]                 | Move down a directory                     |
 | [[kbd:][n]]                 | Move down a line                          |
 | [[kbd:][p]]                 | Move up a line                            |
 | [[kbd:][e]] or [[kbd][RET]] | Visit the file or directory on this line  |
