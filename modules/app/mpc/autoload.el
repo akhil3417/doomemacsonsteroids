@@ -143,12 +143,15 @@ IGNORE-AUTO and NOCONFIRM are passed by `revert-buffer'."
 
 ;;;###autoload
 (defun mpc-current-song ()
-  "Return the current playing song in MPC ."
-  (concat "Playing: " (shell-command-to-string "mpc current")))
+  "Return the current playing song in MPC."
+  (let* ((status (shell-command-to-string "mpc status"))
+         (state (string-match "playing" status))
+         (song (shell-command-to-string "mpc current")))
+    (if state
+        (concat "Playing: " song)
+      (concat "Not playing any song."))))
 
 
-
-;;;###autoload
 (defun mpd-save-excursion (& forms)
   (let ((myln (line-number-at-pos)))
     (progn forms)
@@ -200,20 +203,27 @@ IGNORE-AUTO and NOCONFIRM are passed by `revert-buffer'."
         )
     (shell-command (concat "mpc rm " myplaylist))
     (shell-command (concat "mpc save " myplaylist))))
-
+;;TODO ;; use defcuston and let the user cutomize
 ;; in case you want to change system volume
+;;
 (setq +sys-vol-min 1)
-(setq +sys-vol-max 95)
-(setq +sys-vol-step 5)
 
-;;;###autoload
+(defcustom +sys-vol-max 95
+  "The maximum system volume."
+  :type 'integer
+  :group 'system-volume)
+
+(defcustom +sys-vol-step 5
+  "The increment step for adjusting system volume."
+  :type 'integer
+  :group 'system-volume)
+
 (defun +get-volume ()
   (* +sys-vol-step (round (string-to-number
                                 ;; (shell-command-to-string "awk -F\"[][]\" '/dB/ { print $2 }' <(amixer sget Master)"))
                                 ;; (shell-command-to-string "awk -F\"[][]\" '/dB/ { print $2 }' <(pamixer --get-volume)"))
                                 (shell-command-to-string "pamixer --get-volume"))
                                +sys-vol-step)))
-
 
 ;;;###autoload
 (defun +volume-toggle-mute ()
@@ -237,7 +247,6 @@ IGNORE-AUTO and NOCONFIRM are passed by `revert-buffer'."
        ;; (format "amixer set Master %s%% &" clipped-level) nil nil))))
        (format "pamixer --set-volume %s &" clipped-level) nil nil))))
 
-;;;###autoload
 (defun +volume-step-change (delta)
   (+set-volume (+ delta (+get-volume))))
 
