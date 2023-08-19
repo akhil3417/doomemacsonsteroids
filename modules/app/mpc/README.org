@@ -32,32 +32,61 @@ This module requires:
 These should be available through your OS package manager.
 
 * TODO Usage
-#+begin_quote
- 🔨 /This module's usage documentation is incomplete./ [[doom-contrib-module:][Complete it?]]
-#+end_quote
 
+       Start with =M-x simple-mpc=. The rest of the keybindings now appear in a
+       buffer. Configuration can be done with =M-x customize-group <RET>
+   simple-mpc=. Viewing the current playlist and querying the database is
+       done with =c= and =s= respectively. Most commands (like =simple-mpc-query-add=
+       and =simple-mpc-delete=) respect the region.
 ** Keybinds
-- [[kbd:][<localleader> l]] Toggles whether or not the player repeats the playlist.
-- [[kbd:][<localleader> m]] Mixes the playlist.
-- [[kbd:][<localleader> i]] Insert specific song
-- [[kbd:][<localleader> s]] Save the current playlist to a file
-- [[kbd:][<localleader> p]] Insert playlist save into current playlist
-- [[kbd:][g a]] Sort the browser by artists
-- [[kbd:][g b]] Sort the browser by genre
-- [[kbd:][X]] Stops the player
-- [[kbd:][x]] pauses the player
-- [[kbd:][D]] in the playlist window removes that item
-- [[kbd:][C]] clears the playlist
-- [[kbd:][>]] move five seconds forward in the current track
-- [[kbd:][<]] Opposite five back
-- [[kbd:][RET]] In browser adds the artist's songs to the playlist, in the playlist starts
-  playlist.
-  
-* TODO Configuration
-#+begin_quote
- 🔨 This module has no configuration documentation yet. [[doom-contrib-module:][Write some?]]
-#+end_quote
+        Bindings can be viewed with =describe-mode= (=C-h m=) but are listed
+          below for completeness:
+**** simple-mpc-mode
 
+|-----+-------------------------------------------------------------|
+| key | function                                                    |
+|-----+-------------------------------------------------------------|
+| [[kbd:n][n]]   | Move to the next song in the playlist.                      |
+| [[kbd:p][p]]   | Move to the previous song in the playlist.                  |
+| [[kbd:r][r]]   | Toggle repeat mode.                                         |
+| [[kbd:C][C]]   | Clear the current playlist.                                 |
+| [[kbd:c][c]]   | View the current playlist.                                  |
+| [[kbd:d][d]]   | Delete an item from the playlist without losing your place. |
+| [[kbd:D][D]]   | Remove duplicate items from the playlist.                   |
+| [[kbd:s][s]]   | Perform a query to search for songs.                        |
+| [[kbd:S][S]]   | Shuffle the current playlist.                               |
+| [[kbd:t][t]]   | Toggle playback (pause/resume).                             |
+| [[kbd:L][L]]   | Load a playlist.                                            |
+| [[kbd:a][a]]   | Seek backward in the current song.                          |
+| [[kbd:h][h]]   | Seek forward in the current song.                           |
+| [[kbd:P][P]]   | Save the current playlist.                                  |
+| [[kbd:J][J]]   | Shift the current song down in the playlist.                |
+| [[kbd:K][K]]   | Shift the current song up in the playlist.                  |
+| [[kbd:e][e]]   | Select all items (in Evil mode).                            |
+| [[kbd:E][E]]   | Add everything to the playlist.                             |
+| [[kbd:T][T]]   | Open the Hydra menu for additional MPC commands.            |
+
+**** simple-mpc-query-mode
+|------------+-------------------------------|
+| key        | function                      |
+|------------+-------------------------------|
+| =q=          | simple-mpc-query-quit         |
+| =S=          | simple-mpc-query-sort         |
+| =<return>=   | simple-mpc-query-add          |
+| =<S-return>= | simple-mpc-query-add-and-play |
+|------------+-------------------------------|
+**** simple-mpc-current-playlist-mode
+|----------+----------------------------------|
+| key      | function                         |
+|----------+----------------------------------|
+| =d=        | simple-mpc-delete                |
+| =q=        | simple-mpc-current-playlist-quit |
+| =<return>= | simple-mpc-play-current-line     |
+|----------+----------------------------------|
+
+* TODO Configuration
+Configuring simple-mpc can be done entirely through the =simple-mpc=
+customization group (=M-x customize-group simple-mpc<RET>=).
 * Troubleshooting
 [[doom-report:][Report an issue?]]
 
