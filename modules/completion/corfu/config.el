@@ -47,10 +47,10 @@
                 "TAB" #'corfu-next
                 "S-TAB" #'corfu-previous)))
 
-  (when (modulep! :editor evil)
-    (evil-collection-define-key 'insert 'corfu-map
-      (kbd "RET") #'corfu-insert
-      [return] #'corfu-insert))
+  ;; (when (modulep! :editor evil)
+  ;;   (evil-collection-define-key 'insert 'corfu-map
+  ;;     (kbd "RET") #'corfu-insert
+  ;;     [return] #'corfu-insert))
 
   (after! vertico
     ;; Taken from corfu's README.
@@ -111,9 +111,9 @@ This fixes the cropping due to scaling issues."
     (let* ((text (funcall orig kind))
            (image (get-text-property 1 'display text)))
       (when (imagep image)
-          (setf (image-property image :scale) 1)
-          (put-text-property 0 1 'display '(space :width (0)) text)
-          (put-text-property 2 3 'display '(space :width (0)) text))
+        (setf (image-property image :scale) 1)
+        (put-text-property 0 1 'display '(space :width (0)) text)
+        (put-text-property 2 3 'display '(space :width (0)) text))
       text)))
 
 (use-package! corfu-terminal
