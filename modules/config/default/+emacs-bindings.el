@@ -90,6 +90,8 @@
        :desc "Yank file path"              "y"   #'+default/yank-buffer-path
        :desc "Yank file path from project" "Y"   #'+default/yank-buffer-path-relative-to-project
        :desc "Open scratch buffer"         "x"   #'doom/open-scratch-buffer
+       (:when (modulep! :emacs dired +dirvish)
+       :desc "Dirvish quick access"         "q"   #'dirvish-quick-access)
        :desc "Switch to scratch buffer"    "X"   #'doom/switch-to-scratch-buffer)
 
       ;;; <leader> r --- remote

@@ -786,6 +786,8 @@
        :desc "Soft line wrapping"           "w" #'visual-line-mode
        (:when (modulep! :editor word-wrap)
         :desc "Soft line wrapping"         "w" #'+word-wrap-mode)
+       (:when (modulep! :emacs dired +dirvish)
+        :desc "Dirvish sidebar"         "d" #'dirvish-side)
        (:when (modulep! :ui zen)
         :desc "Zen mode"                   "z" #'+zen/toggle
         :desc "Zen mode (fullscreen)"      "Z" #'+zen/toggle-fullscreen)))
