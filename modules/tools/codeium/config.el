@@ -19,8 +19,8 @@
                 (lambda ()
                   (setq-local completion-at-point-functions (list #'(codeium-python-completion)))))))
 
-  (add-hook 'emacs-startup-hook
-            (lambda () (run-with-timer 0.1 nil #'codeium-init)))
+  ;; (add-hook 'emacs-startup-hook
+  ;;           (lambda () (run-with-timer 0.1 nil #'codeium-init)))
 
   :defer t
   :config
