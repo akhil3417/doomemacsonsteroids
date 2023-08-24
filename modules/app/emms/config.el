@@ -5,6 +5,7 @@
   ;; :commands (emms)
   :init
   (setq emms-directory (concat doom-data-dir "emms")
+        emms-source-playlist-ask-before-overwrite nil ;; for favs
         emms-cache-file (concat doom-cache-dir "emms"))
   :config
   (emms-all)
@@ -105,11 +106,10 @@ Modeled after `emms-player-pause'."
 
 ^Volume^         ^Controls^       ^Playback^              ^Misc^
 ^^^^^^^^----------------------------------------------------------------
-_d_: inc        _n_: next         _r_: repeat one [% s(my/tick-symbol emms-repeat-track)]     _t_oggle modeline
-_o_: dec        _c_: prev         _R_: repeat all [% s(my/tick-symbol emms-repeat-playlist)]     _T_oggle only time
+_d_: inc        _n_: next         _r_: repeat one [% s(my/tick-symbol emms-repeat-track)]   _t_oggle modeline
+_o_: dec        _c_: prev         _R_: repeat all [% s(my/tick-symbol emms-repeat-playlist)] _T_oggle only time
 _v_: sysvol     _a_: seek bw      _#_: shuffle            _s_elect
 _D_: sysvol+    _h_: seek fw      _%_: sort               _g_oto EMMS buffer
-_O_: sysvol-    _SPC_: play/pause _m_: mute/unmute       _l_yrics
 _O_: sysvol-    _SPC_: play/pause _m_: mute/unmute        _f_avorite
 ^ ^             _DEL_: restart                            _L_yrics select
   "
@@ -117,8 +117,8 @@ _O_: sysvol-    _SPC_: play/pause _m_: mute/unmute        _f_avorite
     ;; ("d" emms-volume-raise) ;; TODO ;; needs fix to work with mpc
     ;; ("o" emms-volume-lower)
     ;; in the meanwhile
-    ("d" simple-mpc-increase-volume)
-    ("o" simple-mpc-decrease-volume)
+    ("d" +mpc-vol-inc)
+    ("o" +mpc-vol-dec)
     ("D" my/volume-increase)
     ("O" my/volume-decrease)
     ("m" +volume-toggle-mute)
@@ -141,7 +141,7 @@ _O_: sysvol-    _SPC_: play/pause _m_: mute/unmute        _f_avorite
     ("g" (progn (emms)
                 (with-current-emms-playlist
                   (emms-playlist-mode-center-current))))
-    ("l" my/emms-current-lyrics :exit t)
+    ;; ("l" my/emms-current-lyrics :exit t)
     ("f" +emms-add-to-favorites)
     ("L" my/versuri-select :exit t)
 
@@ -150,7 +150,8 @@ _O_: sysvol-    _SPC_: play/pause _m_: mute/unmute        _f_avorite
 (map! :leader
       (:prefix ("y" . "EMMS audio player")
        :desc "Go to emms playlist" "p" #'emms-playlist-mode-go
-       :desc "Emms Mpd start deamon" "s" #'+emms/mpd-start-music-daemon
+       :desc "Emms Mpd start deamon" "S" #'+emms/mpd-start-music-daemon
+       :desc "select song " "s" #'hydra-emms/+emms-select-song
        :desc "Emms Mpd update deamon" "u" #'+emms/mpc-update-database
        :desc "hydra emms body " "h" #'hydra-emms/body))
 
@@ -168,4 +169,4 @@ _O_: sysvol-    _SPC_: play/pause _m_: mute/unmute        _f_avorite
   (unless (local-key-binding key)
     (define-key (current-local-map) key command)))
 
-(+emms-bind-key (kbd "C-c-e") 'hydra-emms/body)
+;;(+emms-bind-key (kbd "C-c-e") 'hydra-emms/body)

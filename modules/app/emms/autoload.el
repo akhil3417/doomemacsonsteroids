@@ -31,7 +31,25 @@
   (+emms/mpd-start-music-daemon)
   (message "MPD Restarted!"))
 
+;;FIXME
+;;;###autoload
+(defun +mpc-vol-inc ()
+  "Increase the volume of MPD by 5."
+  (interactive)
+  (call-process "mpc" nil nil nil "volume" "+5"))
 
+;;;###autoload
+(defun +mpc-vol-dec ()
+  "Increase the volume of MPD by 5."
+  (interactive)
+  (call-process "mpc" nil nil nil "volume" "-5"))
+
+(defun +mpc-shuffle-dec ()
+  "Increase the volume of MPD by 5."
+  (interactive)
+  (call-process "mpc" nil nil nil "volume" "-5"))
+
+;;;###autoload
   (defun +emms-toggle-time-display ()
     "Toggle the display of time information in the modeline"
     (interactive)
@@ -39,6 +57,7 @@
         (emms-playing-time-disable-display)
       (emms-playing-time-display-mode)))
 
+;;;###autoload
   (defun +emms-select-song ()
     "Select and play a song from the current EMMS playlist."
     (interactive)
@@ -132,7 +151,7 @@ The default format is specified by `emms-source-playlist-default-format'."
                                 ;; (shell-command-to-string "awk -F\"[][]\" '/dB/ { print $2 }' <(pamixer --get-volume)"))
                                 (shell-command-to-string "pamixer --get-volume"))
                                my/volume-step)))
-
+;;;###autoload
 (defun my/set-volume (level)
   (interactive "nVolume level: ")
   (let ((clipped-level
@@ -145,6 +164,7 @@ The default format is specified by `emms-source-playlist-default-format'."
        (format "pamixer --set-volume %s &" clipped-level) nil nil))))
 
 
+;;;###autoload
 (defun +volume-toggle-mute ()
   "Toggle the mute state of the volume"
   (interactive)
