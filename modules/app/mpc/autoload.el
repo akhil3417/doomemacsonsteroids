@@ -119,8 +119,6 @@ IGNORE-AUTO and NOCONFIRM are passed by `revert-buffer'."
   (mpc-shift 1)
   )
 
-
-
 ;;;###autoload
 (defun simple-mpc-toggle-repeat ()
   "Toggle repeat mode."
