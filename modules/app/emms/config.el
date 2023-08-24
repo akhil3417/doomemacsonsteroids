@@ -110,6 +110,7 @@ _o_: dec        _c_: prev         _R_: repeat all [% s(my/tick-symbol emms-repea
 _v_: sysvol     _a_: seek bw      _#_: shuffle            _s_elect
 _D_: sysvol+    _h_: seek fw      _%_: sort               _g_oto EMMS buffer
 _O_: sysvol-    _SPC_: play/pause _m_: mute/unmute       _l_yrics
+_O_: sysvol-    _SPC_: play/pause _m_: mute/unmute        _f_avorite
 ^ ^             _DEL_: restart                            _L_yrics select
   "
     ;; ("v" sndio-win-open :exit t)
@@ -141,6 +142,7 @@ _O_: sysvol-    _SPC_: play/pause _m_: mute/unmute       _l_yrics
                 (with-current-emms-playlist
                   (emms-playlist-mode-center-current))))
     ("l" my/emms-current-lyrics :exit t)
+    ("f" +emms-add-to-favorites)
     ("L" my/versuri-select :exit t)
 
     ("q" nil :exit t))

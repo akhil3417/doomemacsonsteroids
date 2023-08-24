@@ -94,6 +94,38 @@ rather than the whole path."
 
   (setq emms-track-description-function 'my-emms-track-description)
 
+
+;;;###autoload
+(defun +emms-add-to-favorites ()
+  "Add the current song to the hard-coded favorites playlist."
+  (interactive)
+  (save-window-excursion
+        (progn
+          (with-current-buffer "*Music*"
+            (emms-playlist-mode-add-contents))
+          (+emms-playlist-save 'm3u "~/Music/fav.m3u")
+          (setq emms-playlist-buffer
+                (emms-playlist-set-playlist-buffer
+                 (get-buffer "*Music*"))))))
+
+
+;;;###autoload
+(defun +emms-playlist-save (format file)
+  "Store the current playlist to FILE as the type FORMAT.
+The default format is specified by `emms-source-playlist-default-format'."
+  (interactive (list (emms-source-playlist-read-format)
+                     (read-file-name "Store as: "
+                                     emms-source-file-default-directory
+                                     emms-source-file-default-directory
+                                     nil)))
+  (with-temp-buffer
+    (emms-source-playlist-unparse format
+                                  (with-current-emms-playlist
+                                    (current-buffer))
+                                  (current-buffer))
+    (let ((append-to-file t))
+      (write-region (point-min) (point-max) file t))))
+
 (defun my/get-volume ()
   (* my/volume-step (round (string-to-number
                                 ;; (shell-command-to-string "awk -F\"[][]\" '/dB/ { print $2 }' <(amixer sget Master)"))
