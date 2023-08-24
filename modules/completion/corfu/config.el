@@ -47,10 +47,10 @@
                 "TAB" #'corfu-next
                 "S-TAB" #'corfu-previous)))
 
-  ;; (when (modulep! :editor evil)
-  ;;   (evil-collection-define-key 'insert 'corfu-map
-  ;;     (kbd "RET") #'corfu-insert
-  ;;     [return] #'corfu-insert))
+  (when (modulep! :editor evil)
+    (evil-collection-define-key 'insert 'corfu-map
+      (kbd "RET") #'corfu-insert
+      [return] #'corfu-insert))
 
   (after! vertico
     ;; Taken from corfu's README.
@@ -67,10 +67,12 @@
   :after corfu
   :config
   (add-hook 'prog-mode-hook
-            (lambda () (add-to-list 'completion-at-point-functions #'cape-file))))
+            (lambda () (add-to-list 'completion-at-point-functions #'cape-file)))
+  (add-hook! (markdown-mode org-mode)
+    (lambda () (add-to-list 'completion-at-point-functions #'cape-elisp-block))))
 
 (use-package! yasnippet-capf
-  :commands yasnippet-capf
+  :after corfu
   :config
   (add-hook 'yas-minor-mode-hook
             (lambda () (add-to-list 'completion-at-point-functions #'yasnippet-capf))))
@@ -110,7 +112,7 @@ This fixes the cropping due to scaling issues."
     :around #'kind-icon-formatted
     (let* ((text (funcall orig kind))
            (image (get-text-property 1 'display text)))
-      (when (imagep image)
+      (when (eq (car-safe image) 'image)
         (setf (image-property image :scale) 1)
         (put-text-property 0 1 'display '(space :width (0)) text)
         (put-text-property 2 3 'display '(space :width (0)) text))

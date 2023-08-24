@@ -11,4 +11,4 @@
 (when (modulep! :os tty)
   (package! corfu-terminal :pin "5ce4c11b8efd4d2fd1b404b9422bb85b05476da0"))
 (when (modulep! :editor snippets)
-  (package! yasnippet-capf :recipe (:repo "https://github.com/LuigiPiucco/yasnippet-capf.git") :pin "c169e6724f0b7a594d985aa8da822bf7bcd2e2f9"))
+  (package! yasnippet-capf :pin "40654214db7a44db3a99321447632b43a10fae57"))
