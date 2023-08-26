@@ -119,10 +119,10 @@ _O_: sysvol-    _SPC_: play/pause _m_: mute/unmute        _f_avorite
     ;; in the meanwhile
     ("d" +mpc-vol-inc)
     ("o" +mpc-vol-dec)
-    ("D" my/volume-increase)
-    ("O" my/volume-decrease)
+    ("D" +volume-increase)
+    ("O" +volume-decrease)
     ("m" +volume-toggle-mute)
-    ("v" my/set-volume)
+    ("v" +set-volume)
     ("n" emms-next)
     ("c" emms-previous) ;;blame my keyboard layout for not beign mnemonic
     ("a" emms-seek-backward)
@@ -132,7 +132,8 @@ _O_: sysvol-    _SPC_: play/pause _m_: mute/unmute        _f_avorite
     ("<backspace>" (emms-player-seek-to 0))
     ("r" emms-toggle-repeat-track)
     ("R" emms-toggle-repeat-playlist)
-    ("#" emms-shuffle)
+    ;; ("#" emms-shuffle)
+    ("#" +mpc-toggle-shuffle)
     ("%" emms-sort)
     ("t" (progn (+emms-toggle-time-display)
                 (emms-mode-line-toggle)))

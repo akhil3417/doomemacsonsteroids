@@ -36,18 +36,26 @@
 (defun +mpc-vol-inc ()
   "Increase the volume of MPD by 5."
   (interactive)
-  (call-process "mpc" nil nil nil "volume" "+5"))
+  (call-process "mpc" nil nil nil "volume" "+5")
+  (let ((volume (shell-command-to-string "mpc volume")))
+    (message "Current volume: %s" volume)))
 
 ;;;###autoload
 (defun +mpc-vol-dec ()
   "Increase the volume of MPD by 5."
   (interactive)
-  (call-process "mpc" nil nil nil "volume" "-5"))
+  (call-process "mpc" nil nil nil "volume" "-5")
+  (let ((volume (shell-command-to-string "mpc volume")))
+    (message "Current volume: %s" volume)))
 
-(defun +mpc-shuffle-dec ()
-  "Increase the volume of MPD by 5."
+(defun +mpc-toggle-shuffle ()
+  "Toggle shuffle in MPD."
   (interactive)
-  (call-process "mpc" nil nil nil "volume" "-5"))
+  (call-process "mpc" nil nil nil "random")
+  (let ((status (shell-command-to-string "mpc")))
+    (if (string-match "random: on" status)
+        (message "Shuffle is on.")
+      (message "Shuffle is off."))))
 
 ;;;###autoload
   (defun +emms-toggle-time-display ()
@@ -145,14 +153,28 @@ The default format is specified by `emms-source-playlist-default-format'."
     (let ((append-to-file t))
       (write-region (point-min) (point-max) file t))))
 
-(defun my/get-volume ()
-  (* my/volume-step (round (string-to-number
+
+(setq +sys-vol-min 1)
+
+(defcustom +sys-vol-max 95
+  "The maximum system volume."
+  :type 'integer
+  :group 'system-volume)
+
+(defcustom +sys-vol-step 5
+  "The increment step for adjusting system volume."
+  :type 'integer
+  :group 'system-volume)
+
+(defun +get-volume ()
+  (* +sys-vol-step (round (string-to-number
                                 ;; (shell-command-to-string "awk -F\"[][]\" '/dB/ { print $2 }' <(amixer sget Master)"))
                                 ;; (shell-command-to-string "awk -F\"[][]\" '/dB/ { print $2 }' <(pamixer --get-volume)"))
                                 (shell-command-to-string "pamixer --get-volume"))
-                               my/volume-step)))
+                               +sys-vol-step)))
+
 ;;;###autoload
-(defun my/set-volume (level)
+(defun +set-volume (level)
   (interactive "nVolume level: ")
   (let ((clipped-level
          (cond ((< level +sys-vol-min) +sys-vol-min)
