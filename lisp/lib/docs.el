@@ -25,7 +25,7 @@
     (("/docs/[^/]+\\.org$" "/modules/README\\.org$")
      (:label "Back to index"
       :icon "arrow_back"
-      :link ("doom-index" . "")
+      :link "doom-index"
       :help-echo "Navigate to the root index"))
     ("/modules/[^/]+/README\\.org$"
      (:label "Back to module index"
@@ -102,7 +102,7 @@
   "Create a header link according to SPEC."
   (let ((icon (and (plist-get spec :icon)
                    (funcall (or (plist-get spec :icon-function)
-                                #'all-the-icons-material)
+                                #'nerd-icons-material)
                             (plist-get spec :icon))))
         (label (pcase (plist-get spec :label)
                  ((and (pred functionp) lab)
@@ -239,11 +239,9 @@
                   (beg (max (point-min) (1- (org-element-property :begin el))))
                   (end (org-element-property :end el))
                   ((memq (org-element-type el) '(drawer property-drawer))))
-         (when (org-current-level)
+         (when (org-element-property-inherited :level el)
            (cl-decf end))
-         (org-fold-core-region beg end doom-docs-mode 'doom-doc-hidden)
-         (when doom-docs-mode
-           (org-fold-core-region beg end nil 'org-hide-drawer)))))
+         (org-fold-core-region beg end doom-docs-mode 'doom-doc-hidden))))
     ;; FIX: If the cursor remains within a newly folded region, that folk will
     ;;   come undone, so we move it.
     (if pt (goto-char pt))))
@@ -428,13 +426,13 @@ This primes `org-mode' for reading."
 
 (defvar doom-docs--id-locations nil)
 (defvar doom-docs--id-files nil)
+(defvar doom-docs--id-location-file (file-name-concat doom-cache-dir "doom-docs-org-ids"))
 ;;;###autoload
 (defun doom/reload-docs (&optional force)
   "Reload the ID locations in Doom's documentation and open docs buffers."
   (interactive (list 'interactive))
   (with-temp-buffer
-    (let ((org-id-locations-file
-           (doom-path (file-truename doom-cache-dir) "doom-docs-org-ids"))
+    (let ((org-id-locations-file doom-docs--id-location-file)
           (org-id-track-globally t)
           org-agenda-files
           org-id-extra-files
@@ -465,14 +463,14 @@ This primes `org-mode' for reading."
   (let ((org-id-link-to-org-use-id t)
         (org-id-method 'uuid)
         (org-id-track-globally t)
-        (org-id-locations-file (doom-path doom-cache-dir "doom-docs-org-ids"))
+        (org-id-locations-file doom-docs--id-location-file)
         (org-id-locations doom-docs--id-locations)
         (org-id-files doom-docs--id-files))
     (doom/reload-docs)
-    (let ((id (org-id-new)))
-      (org-id-add-location
-       id (buffer-file-name (buffer-base-buffer)))
-      id)))
+    (when-let (fname (buffer-file-name (buffer-base-buffer)))
+      (let ((id (org-id-new)))
+        (org-id-add-location id fname)
+        id))))
 
 ;;;###autoload
 (define-derived-mode doom-docs-org-mode org-mode "Doom Docs"
@@ -488,7 +486,7 @@ Keeps track of its own IDs in `doom-docs-dir' and toggles `doom-docs-mode' when
     (setq-local org-id-link-to-org-use-id t
                 org-id-method 'uuid
                 org-id-track-globally t
-                org-id-locations-file (doom-path doom-cache-dir "doom-docs-org-ids")
+                org-id-locations-file doom-docs--id-location-file
                 org-id-locations doom-docs--id-locations
                 org-id-files doom-docs--id-files
                 org-num-max-level 3

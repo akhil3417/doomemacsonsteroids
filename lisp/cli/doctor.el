@@ -96,48 +96,86 @@ in."
      (error! "Couldn't find the `rg' binary; this a hard dependecy for Doom, file searches may not work at all")))
 
   (print! (start "Checking for Emacs config conflicts..."))
-  (when (file-exists-p "~/.emacs")
-    (warn! "Detected an ~/.emacs file, which may prevent Doom from loading")
-    (explain! "If Emacs finds an ~/.emacs file, it will ignore ~/.emacs.d, where Doom is "
-              "typically installed. If you're seeing a vanilla Emacs splash screen, this "
-              "may explain why. If you use Chemacs, you may ignore this warning."))
+  (print-group!
+    (unless (or (file-equal-p doom-emacs-dir "~/.emacs.d")
+                (file-equal-p doom-emacs-dir "~/.config/emacs"))
+      (print! (warn "Doom is installed in a non-standard location"))
+      (explain! "The standard locations are ~/.config/emacs or ~/.emacs.d. Emacs will fail "
+                "to load Doom if it is not explicitly told where to look for it. In Emacs 29+, "
+                "this is possible with the --init-directory option:\n\n"
+                "  $ emacs --init-directory '" (abbreviate-file-name doom-emacs-dir) "'\n\n"
+                "However, Emacs 27-28 users have no choice but to move Doom to a standard "
+                "location.\n\n"
+                "Chemacs users may ignore this warning, however."))
+    (let (found?)
+      (dolist (file '("~/_emacs" "~/.emacs" "~/.emacs.el" "~/.emacs.d" "~/.config/emacs"))
+        (when (and (file-exists-p file)
+                   (not (file-equal-p file doom-emacs-dir)))
+          (setq found? t)
+          (print! (warn "Found another Emacs config: %s (%s)")
+                  file (if (file-directory-p file) "directory" "file"))))
+      (when found?
+        (explain! "Having multiple Emacs configs may prevent Doom from loading properly. Emacs "
+                  "will load the first it finds and ignore the rest. If Doom isn't starting up "
+                  "correctly (e.g. you get a vanilla splash screen), make sure that only one of "
+                  "these exist.\n\n"
+                  "Chemacs users may ignore this warning."))))
 
-  (print! (start "Checking for great Emacs features..."))
-  (unless (functionp 'json-serialize)
-    (warn! "Emacs was not built with native JSON support")
-    (explain! "Users will see a substantial performance gain by building Emacs with "
-              "jansson support (i.e. a native JSON library), particularly LSP users. "
-              "You must install a prebuilt Emacs binary with this included, or compile "
-              "Emacs with the --with-json option."))
-  (unless (featurep 'native-compile)
-    (warn! "Emacs was not built with native compilation support")
-    (explain! "Users will see a substantial performance gain by building Emacs with "
-              "native compilation support, availible in emacs 28+."
-              "You must install a prebuilt Emacs binary with this included, or compile "
-              "Emacs with the --with-native-compilation option."))
+  (print! (start "Checking for missing Emacs features..."))
+  (print-group!
+    (unless (functionp 'json-serialize)
+      (warn! "Emacs was not built with native JSON support")
+      (explain! "Users will see a substantial performance gain by building Emacs with "
+                "jansson support (i.e. a native JSON library), particularly LSP users. "
+                "You must install a prebuilt Emacs binary with this included, or compile "
+                "Emacs with the --with-json option."))
+    (unless (featurep 'native-compile)
+      (warn! "Emacs was not built with native compilation support")
+      (explain! "Users will see a substantial performance gain by building Emacs with "
+                "native compilation support, availible in emacs 28+."
+                "You must install a prebuilt Emacs binary with this included, or compile "
+                "Emacs with the --with-native-compilation option.")))
 
   (print! (start "Checking for private config conflicts..."))
-  (let* ((xdg-dir (concat (or (getenv "XDG_CONFIG_HOME")
-                              "~/.config")
-                          "/doom/"))
-         (doom-dir (or (getenv "DOOMDIR")
-                       "~/.doom.d/"))
-         (dir (if (file-directory-p xdg-dir)
-                  xdg-dir
-                doom-dir)))
-    (when (file-equal-p dir doom-emacs-dir)
-      (print! (error "Doom was cloned to %S, not ~/.emacs.d or ~/.config/emacs"
-                     (path dir)))
-      (explain! "Doom's source and your private Doom config have to live in separate directories. "
-                "Putting them in the same directory (without changing the DOOMDIR environment "
-                "variable) will cause errors on startup."))
-    (when (and (not (file-equal-p xdg-dir doom-dir))
-               (file-directory-p xdg-dir)
-               (file-directory-p doom-dir))
-      (print! (warn "Detected two private configs, in %s and %s")
-              (abbreviate-file-name xdg-dir)
-              doom-dir)
-      (explain! "The second directory will be ignored, as it has lower precedence.")))
+  (print-group!
+    (let* ((xdg-dir (concat (or (getenv "XDG_CONFIG_HOME")
+                                "~/.config")
+                            "/doom/"))
+           (doom-dir (or (getenv "DOOMDIR")
+                         "~/.doom.d/"))
+           (dir (if (file-directory-p xdg-dir)
+                    xdg-dir
+                  doom-dir)))
+      (when (file-equal-p dir doom-emacs-dir)
+        (print! (error "Doom was cloned to %S, not ~/.emacs.d or ~/.config/emacs"
+                       (path dir)))
+        (explain! "Doom's source and your private Doom config have to live in separate directories. "
+                  "Putting them in the same directory (without changing the DOOMDIR environment "
+                  "variable) will cause errors on startup."))
+      (when (and (not (file-equal-p xdg-dir doom-dir))
+                 (file-directory-p xdg-dir)
+                 (file-directory-p doom-dir))
+        (print! (warn "Detected two private configs, in %s and %s")
+                (abbreviate-file-name xdg-dir)
+                doom-dir)
+        (explain! "The second directory will be ignored, as it has lower precedence."))))
+
+  (print! (start "Checking for common environmental issues..."))
+  (when (string-match-p "/fish$" shell-file-name)
+    (print! (warn "Detected Fish as your $SHELL"))
+    (explain! "Fish (and possibly other non-POSIX shells) is known to inject garbage "
+              "output into some of the child processes that Emacs spawns. Many Emacs "
+              "packages/utilities will choke on this output, causing unpredictable issues. "
+              "To get around this, either:\n\n"
+              "  - Add the following to $DOOMDIR/config.el:\n\n"
+              "    (setq shell-file-name (executable-find \"bash\"))\n\n"
+              "  - Or change your default shell to a POSIX shell (like bash or zsh) "
+              "    and explicitly configure your terminal apps to use the shell you "
+              "    want.\n\n"
+              "If you opt for option 1 and use one of Emacs' terminal emulators, you "
+              "will also need to configure them to use Fish, e.g.\n\n"
+              "  (setq-default vterm-shell (executable-find \"fish\"))\n\n"
+              "  (setq-default explicit-shell-file-name (executable-find \"fish\"))\n"))
 
   (print! (start "Checking for stale elc files..."))
   (elc-check-dir doom-core-dir)
@@ -205,13 +243,13 @@ in."
           ;; Check for fonts
           (if (not (executable-find "fc-list"))
               (warn! "Warning: unable to detect fonts because fontconfig isn't installed")
-            ;; all-the-icons fonts
+            ;; nerd-icons fonts
             (when (and (pcase system-type
                          (`gnu/linux (concat (or (getenv "XDG_DATA_HOME")
                                                  "~/.local/share")
                                              "/fonts/"))
                          (`darwin "~/Library/Fonts/"))
-                       (require 'all-the-icons nil t))
+                       (require 'nerd-icons nil t))
               (with-temp-buffer
                 (let ((errors 0))
                   (cl-destructuring-bind (status . output)
@@ -219,13 +257,13 @@ in."
                     (if (not (zerop status))
                         (print! (error "There was an error running `fc-list'. Is fontconfig installed correctly?"))
                       (insert (cdr (doom-call-process "fc-list" "" "file")))
-                      (dolist (font all-the-icons-font-names)
+                      (dolist (font nerd-icons-font-names)
                         (if (save-excursion (re-search-backward font nil t))
                             (success! "Found font %s" font)
                           (print! (warn "Warning: couldn't find %S font") font)))
                       (when (> errors 0)
-                        (explain! "Some all-the-icons fonts were missing.\n\n"
-                                  "You can install them by running `M-x all-the-icons-install-fonts' within Emacs.\n"
+                        (explain! "Some nerd-icons fonts were missing.\n\n"
+                                  "You can install them by running `M-x nerd-icons-install-fonts' within Emacs.\n"
                                   "This could also mean you've installed them in non-standard locations, in which "
                                   "case feel free to ignore this warning.")))))))))
 

@@ -48,6 +48,17 @@ This is ignored by ccls.")
   (set-docsets! 'c-mode "C")
   (set-docsets! 'c++-mode "C++" "Boost")
   (set-electric! '(c-mode c++-mode objc-mode java-mode) :chars '(?\n ?\} ?\{))
+  (set-formatter!
+    'clang-format
+    '("clang-format"
+      "-assume-filename"
+      (or (buffer-file-name)
+          (cdr (assoc major-mode
+                      '((c-mode        . ".c")
+                        (c++-mode      . ".cpp")
+                        (cuda-mode     . ".cu")
+                        (protobuf-mode . ".proto"))))))
+    :modes '(c-mode c++-mode protobuf-mode cuda-mode))
   (set-rotate-patterns! 'c++-mode
     :symbols '(("public" "protected" "private")
                ("class" "struct")))
@@ -229,8 +240,7 @@ If rtags or rdm aren't available, fail silently instead of throwing a breaking e
   ;; than display a jarring confirmation prompt for killing it.
   (add-hook! 'kill-emacs-hook (ignore-errors (rtags-cancel-process)))
 
-  (add-hook 'rtags-jump-hook #'better-jumper-set-jump)
-  (add-hook 'rtags-after-find-file-hook #'recenter))
+  (add-hook 'rtags-jump-hook #'better-jumper-set-jump))
 
 
 ;;
