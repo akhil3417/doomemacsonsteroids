@@ -25,8 +25,8 @@ Dired enhancement package [[https://github.com/alexluigit/dirvish][Dirvish]].
   + Enable line highlighting, hide the cursor
 
 ** Packages
-- [[doom-package:][dirvish]]
-- [[doom-package:][diredfl]]
+- [[doom-package:dirvish]]
+- [[doom-package:diredfl]]
 
 ** TODO Hacks
 #+begin_quote
@@ -86,7 +86,7 @@ keybindings.
 | Keybind           | Description                        |
 |-------------------+------------------------------------|
 | [[kbd:][SPC f d]] | Find directory with dired          |
-| [[kbd:][SPC f q]] | Dirvish quick access |
+| [[kbd:][SPC f q]] | Dirvish quick access               |
 | [[kbd:][SPC o -]] | Jump to current directory in dired |
 | [[kbd:][SPC t d]] | Toggle dirvish sidebar             |
 
@@ -148,7 +148,7 @@ Other bindings in this module:
 | [[kbd:][M-b]]     | Jump to previous dired history entry          |
 | [[kbd:][M-n]]     | Narrow the buffer with user input             |
 | [[kbd:][M-t]]     | Toggle fullscreen (preview)                   |
-| [[kbd:][C-c C-e]] | Rename entries with [[doom-package:][wdired]] |
+| [[kbd:][C-c C-e]] | Rename entries with [[doom-package:wdired]]   |
 
 * Configuration
 ** Quick access entries

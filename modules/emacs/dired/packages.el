@@ -1,6 +1,5 @@
 ;; -*- no-byte-compile: t; -*-
 ;;; emacs/dired/packages.el
 
-(package! diredfl :pin "62b559e1d6b69834a56a57eb1832ac6ad4d2e5d0")
-(when (modulep! +dirvish)
-  (package! dirvish :pin "11a3bec247b9e4742f171434e948895b3dc730ed"))
+(package! diredfl :pin "17e805763d57370c4eff2c92ed257b72eeb9f94a")
+(package! dirvish :pin "6e25b16e1c68d92f917189f15ac49e4ff480dce2")
