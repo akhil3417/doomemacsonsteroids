@@ -35,6 +35,10 @@ be formatted and returned to the buffer using
 As of writing this, apheleia doesn't /yet/ support regions or similar kinds of
 buffers, so there are a couple of hacks to attempt to rectify this.
 
+For the most part, things should work as expected. However, because the
+formatting occurs on an isolated version of the buffer; lisp/scheme or similarly
+indentation-based languages may produce poor results.
+
 ** TODO Changelog
 # This section will be machine generated. Don't edit it by hand.
 /This module does not have a changelog yet./
@@ -66,6 +70,15 @@ provide a simple macro that looks like the below:
 
 #+begin_src emacs-lisp
 (set-formatter! 'unique-name '("command" "line" "here") :modes '(name-of-major-mode))
+#+end_src
+
+If you're trying to override a formatter that has previously been defined by
+Doom, you will need to ensure that the call in your config is contained within
+an =after!= form, eg below to override Clojure's with =zprint=:
+
+#+begin_src emacs-lisp
+(after! clojure-mode
+  (set-formatter! 'zprint '("zprint" "-") :modes '(clojure-mode)))
 #+end_src
 
 There are a few bonus symbols that apheleia uses (for example =npx= will be
@@ -141,5 +154,5 @@ Any issues specific to apheleia should most often be reported upstream [[https:/
 
 * TODO Appendix
 #+begin_quote
- 🔨 This module has no appendix yet. [[doom-contrib-module:][Write one?]]
+ 󱌣 This module has no appendix yet. [[doom-contrib-module:][Write one?]]
 #+end_quote
