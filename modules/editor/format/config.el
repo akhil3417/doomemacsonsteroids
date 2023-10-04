@@ -38,13 +38,16 @@ select buffers.")
   "Enable formatting on save in certain major modes.
 This is controlled by `+format-on-save-disabled-modes'."
   (or (eq major-mode 'fundamental-mode)
-      (string-empty-p (string-trim (buffer-name)))
+      (string-blank-p (buffer-name))
       (not (null (memq major-mode +format-on-save-disabled-modes)))))
 
 
-(when (modulep! +onsave)
-  (after! apheleia-core
+(after! apheleia-core
+  (add-to-list 'doom-debug-variables '(apheleia-log-only-errors . nil))
+
+  (when (modulep! +onsave)
     (add-to-list 'apheleia-inhibit-functions #'+format-inhibit-maybe-h)))
+
 
 ;;
 ;;; Hacks
@@ -52,7 +55,7 @@ This is controlled by `+format-on-save-disabled-modes'."
 (defadvice! +format--inhibit-reformat-on-prefix-arg-a (orig-fn &optional arg)
   "Make it so \\[save-buffer] with prefix arg inhibits reformatting."
   :around #'save-buffer
-  (let ((apheleia-mode (and apheleia-mode (member arg '(nil 1)))))
+  (let ((apheleia-mode (and apheleia-mode (memq arg '(nil 1)))))
     (funcall orig-fn)))
 
 (add-hook!

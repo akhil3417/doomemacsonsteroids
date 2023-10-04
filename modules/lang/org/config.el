@@ -481,7 +481,9 @@ relative to `org-directory', unless it is an absolute path."
 
   ;; Autoload all these commands that org-attach doesn't autoload itself
   (use-package! org-attach
-    :commands (org-attach-new
+    :commands (org-attach-delete-one
+               org-attach-delete-all
+               org-attach-new
                org-attach-open
                org-attach-open-in-emacs
                org-attach-reveal-in-emacs
@@ -548,34 +550,32 @@ relative to `org-directory', unless it is an absolute path."
      "var"
      :follow (-call-interactively #'helpful-variable)
      :activate-func #'+org-link--var-link-activate-fn
-     :face 'org-code)
+     :face '(font-lock-variable-name-face underline))
     (org-link-set-parameters
      "fn"
      :follow (-call-interactively #'helpful-callable)
      :activate-func #'+org-link--fn-link-activate-fn
-     :face 'org-code)
+     :face '(font-lock-function-name-face underline))
     (org-link-set-parameters
      "face"
      :follow (-call-interactively #'describe-face)
-     :activate-func #'+org-link--face-link-activate-face
+     :activate-func #'+org-link--face-link-activate-fn
      :face '(font-lock-type-face underline))
     (org-link-set-parameters
      "cmd"
      :follow (-call-interactively #'describe-command)
-     :activate-func #'+org-link--command-link-activate-command
+     :activate-func #'+org-link--command-link-activate-fn
      :face 'help-key-binding
      :help-echo #'+org-link-doom--help-echo-from-textprop)
     (org-link-set-parameters
      "doom-package"
-     :follow #'+org-link-follow-doom-package-fn
+     :follow #'+org-link--doom-package-link-follow-fn
      :activate-func #'+org-link--doom-package-link-activate-fn
-     :face (lambda (_) '(:inherit org-priority :slant italic))
      :help-echo #'+org-link-doom--help-echo-from-textprop)
     (org-link-set-parameters
      "doom-module"
-     :follow #'+org-link-follow-doom-module-fn
+     :follow #'+org-link--doom-module-link-follow-fn
      :activate-func #'+org-link--doom-module-link-activate-fn
-     :face #'+org-link--doom-module-link-face-fn
      :help-echo #'+org-link-doom--help-echo-from-textprop)
     (org-link-set-parameters
      "doom-executable"
@@ -614,7 +614,7 @@ relative to `org-directory', unless it is an absolute path."
                 (format "https://github.com/%s"
                         (string-remove-prefix
                          "@" (+org-link-read-desc-at-point link)))))
-     :face (lambda (_) 'org-priority))
+     :face 'org-priority)
     (org-link-set-parameters
      "doom-changelog"
      :follow (lambda (link)
