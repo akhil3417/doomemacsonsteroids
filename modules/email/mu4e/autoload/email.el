@@ -113,7 +113,7 @@ will also be the width of all other printable characters."
       (insert str)
       (car (window-text-pixel-size)))))
 
-(cl-defun +mu4e-normalised-icon (name &key set color height v-adjust)
+(cl-defun +mu4e-normalised-icon (name &key set color height v-adjust space-right)
   "Convert :icon declaration to icon"
   (let* ((icon-set (intern (concat "nerd-icons-" (or set "faicon"))))
          (v-adjust (or v-adjust 0.02))
@@ -123,16 +123,26 @@ will also be the width of all other printable characters."
                  (apply icon-set `(,name  :height ,height :v-adjust ,v-adjust))))
          (icon-width (+mu4e--get-string-width icon))
          (space-width (+mu4e--get-string-width " "))
-         (space-factor (- 2 (/ (float icon-width) space-width))))
-    (concat (propertize " " 'display `(space . (:width ,space-factor))) icon)))
+         (space-factor (- 2 (/ (float icon-width) space-width)))
+         ;; always pad the left
+         (space-left (propertize " " 'display `(space . (:width ,space-factor))))
+         ;; optionally pad the right
+         (space-right (if space-right space-left "")))
+    (format "%s%s%s" space-left icon space-right)))
 
 ;; Set up all the fancy icons
 ;;;###autoload
 (defun +mu4e-initialise-icons ()
   (setq mu4e-use-fancy-chars t
+
+        mu4e-modeline-all-clear      (cons "C:" (+mu4e-normalised-icon "nf-md-check" :set "mdicon" :height 1.0 :space-right t)) ;;󰄬
+        mu4e-modeline-all-read       (cons "R:" (+mu4e-normalised-icon "nf-md-email_check" :set "mdicon" :height 1.0 :space-right t)) ;;󰪱
+        mu4e-modeline-unread-items   (cons "U:" (+mu4e-normalised-icon "nf-md-email_alert" :set "mdicon" :height 1.0 :space-right t)) ;;󰛏
+        mu4e-modeline-new-items      (cons "N:" (+mu4e-normalised-icon "nf-md-sync" :set "mdicon" :height 1.0 :space-right t)) ;;󰓦
+
         mu4e-headers-draft-mark      (cons "D" (+mu4e-normalised-icon "nf-fa-pencil"))
         mu4e-headers-flagged-mark    (cons "F" (+mu4e-normalised-icon "nf-fa-flag"))
-        mu4e-headers-new-mark        (cons "N" (+mu4e-normalised-icon "nf-md-sync" :set "mdicon" :height 0.8 :v-adjust -0.10))
+        mu4e-headers-new-mark        (cons "N" (+mu4e-normalised-icon "nf-md-sync" :set "mdicon" :v-adjust -0.10))
         mu4e-headers-passed-mark     (cons "P" (+mu4e-normalised-icon "nf-fa-arrow_right"))
         mu4e-headers-replied-mark    (cons "R" (+mu4e-normalised-icon "nf-fa-reply"))
         mu4e-headers-seen-mark       (cons "S" "") ;(+mu4e-normalised-icon "eye" :height 0.6 :v-adjust 0.07 :color "dsilver"))

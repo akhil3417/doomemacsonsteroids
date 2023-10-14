@@ -120,6 +120,7 @@ is non-nil."
   ;; Better search symbols
   (letf! ((defun make-help-button (text help-echo)
             (with-temp-buffer
+              (insert " ")
               (insert-text-button text
                                   'help-echo help-echo
                                   'mouse-face nil)
@@ -128,13 +129,13 @@ is non-nil."
             (cons (make-help-button text1 help-echo)
                   (make-help-button text2 help-echo))))
     (setq mu4e-headers-threaded-label
-          (make-help-button-cons "T" (concat " " (nerd-icons-octicon "nf-oct-git_branch" :v-adjust 0.05))
+          (make-help-button-cons "T" (nerd-icons-octicon "nf-oct-git_branch" :v-adjust 0.05)
                                  "Thread view")
           mu4e-headers-related-label
-          (make-help-button-cons "R" (concat " " (nerd-icons-mdicon "nf-md-link" :v-adjust -0.1))
+          (make-help-button-cons "R" (nerd-icons-mdicon "nf-md-link" :v-adjust -0.1)
                                  "Showing related emails")
           mu4e-headers-full-label
-          (make-help-button-cons "F" (concat " " (nerd-icons-mdicon "nf-md-disc"))
+          (make-help-button-cons "F" (nerd-icons-mdicon "nf-md-disc")
                                  "Search is full!")))
 
   ;; set mail user agent
@@ -220,6 +221,9 @@ is non-nil."
 
   ;; Wrap text in messages
   (setq-hook! 'mu4e-view-mode-hook truncate-lines nil)
+
+  ;; mu4e now uses `display-buffer-alist' so we need to add some rules of our own
+  (set-popup-rule! "^\\*mu4e-\\(main\\|headers\\)\\*" :ignore t)
 
   ;; Html mails might be better rendered in a browser
   (add-to-list 'mu4e-view-actions '("View in browser" . mu4e-action-view-in-browser))
