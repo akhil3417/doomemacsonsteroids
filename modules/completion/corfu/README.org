@@ -71,25 +71,25 @@ By default, completion gets triggered after typing 2 non-space consecutive
 characters, or by means of the [[kbd:][C-SPC]] keybinding at any moment. While the popup
 is visible, the following relevant keys are available:
 
-| Keybind  | Description                                             |
-|----------+---------------------------------------------------------|
-| [[kbd:][<down>]]   | Go to next candidate                                    |
-| [[kbd:][<up>]]     | Go to previous candidate                                |
-| [[kbd:][C-n]]      | Go to next candidate                                    |
-| [[kbd:][C-p]]      | Go to previous candidate                                |
-| [[kbd:][C-j]]      | (evil) Go to next candidate                             |
-| [[kbd:][C-k]]      | (evil) Go to previous candidate                         |
-| [[kbd:][C-<down>]] | Go to next doc line                                     |
-| [[kbd:][C-<up>]]   | Go to previous doc line                                 |
-| [[kbd:][C-S-n]]    | Go to next doc line                                     |
-| [[kbd:][C-S-p]]    | Go to previous doc line                                 |
-| [[kbd:][C-S-j]]    | (evil) Go to next doc line                              |
-| [[kbd:][C-S-k]]    | (evil) Go to previous doc line                          |
-| [[kbd:][C-h]]      | Toggle documentation (if available)                     |
+| Keybind  | Description                                                      |
+|----------+------------------------------------------------------------------|
+| [[kbd:][<down>]]   | Go to next candidate                                             |
+| [[kbd:][<up>]]     | Go to previous candidate                                         |
+| [[kbd:][C-n]]      | Go to next candidate                                             |
+| [[kbd:][C-p]]      | Go to previous candidate                                         |
+| [[kbd:][C-j]]      | (evil) Go to next candidate                                      |
+| [[kbd:][C-k]]      | (evil) Go to previous candidate                                  |
+| [[kbd:][C-<down>]] | Go to next doc line                                              |
+| [[kbd:][C-<up>]]   | Go to previous doc line                                          |
+| [[kbd:][C-S-n]]    | Go to next doc line                                              |
+| [[kbd:][C-S-p]]    | Go to previous doc line                                          |
+| [[kbd:][C-S-j]]    | (evil) Go to next doc line                                       |
+| [[kbd:][C-S-k]]    | (evil) Go to previous doc line                                   |
+| [[kbd:][C-h]]      | Toggle documentation (if available)                              |
 | [[kbd:][M-m]]      | Export to minibuffer (if [[doom-module::completion vertico]])        |
 | [[kbd:][M-j]]      | (evil) Export to minibuffer (if [[doom-module::completion vertico]]) |
-| [[kbd:][RET]]      | Insert candidate                                        |
-| [[kbd:][SPC]]      | Quit autocompletion after a wildcard or pass-through    |
+| [[kbd:][RET]]      | Insert candidate                                                 |
+| [[kbd:][SPC]]      | Quit autocompletion after a wildcard or pass-through             |
 | [[kbd:][C-SPC]]    | Complete (unless [[doom-module::completion corfu +tng]])             |
 | [[kbd:][C-SPC]]    | (when completing) Insert separator DWIM (see below)              |
 
@@ -112,7 +112,10 @@ completing inserts a space as separator. This allows searching with
 space-separated terms; each piece will match individually and in any order, with
 smart casing. Pressing just [[kbd:][SPC]] acts as normal and quits completion, so that
 when typing sentences it doesn't try to complete the whole sentence instead of
-just the word.
+just the word. Pressing [[kdb:][C-SPC]] with point after a separator escapes it with a
+backslash, including the space in the search term, and pressing it with an
+already escaped separator before point deletes it. Thus, you can cycle back if
+you accidentaly press more than needed.
 
 Additionally, for users of evil and regular corfu style, [[kdb:][C-SPC]] is smart
 regarding your state. In normal-like states, enter insert then start corfu; in
