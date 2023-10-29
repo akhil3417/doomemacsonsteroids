@@ -67,25 +67,26 @@ major mode regardless of size.")
   (when (modulep! +icons)
     (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
 
-  (map! :map corfu-map
-        [return] #'corfu-insert
-        "RET" #'corfu-insert)
-  (when (modulep! +orderless)
+  (let ((cmds-del (cmds! (and (modulep! +tng)
+                              (> corfu--index -1)
+                              (eq corfu-preview-current 'insert))
+                         #'corfu-reset)))
     (map! :map corfu-map
-          "C-SPC" #'corfu-insert-separator))
-  (when (modulep! +tng)
-    (map! :map corfu-map
-          [tab] #'corfu-next
-          [backtab] #'corfu-previous
-          "TAB" #'corfu-next
-          "S-TAB" #'corfu-previous)
-    (let ((cmds-del (cmds! (and (modulep! +tng)
-                                (> corfu--index -1)
-                                (eq corfu-preview-current 'insert))
-                           #'corfu-reset)))
-      (map! :map corfu-map
+          [return] #'corfu-insert
+          "RET" #'corfu-insert
+          (:when (modulep! +orderless)
+            "<remap> <completion-at-point>" #'+corfu-smart-sep-toggle-escape)
+          (:when (modulep! +tng)
+            [tab] #'corfu-next
+            [backtab] #'corfu-previous
+            "TAB" #'corfu-next
+            "S-TAB" #'corfu-previous
             [backspace] cmds-del
             "DEL" cmds-del)))
+
+  (when (modulep! +orderless)
+    (after! orderless
+      (setq orderless-component-separator #'orderless-escapable-split-on-space)))
 
   (after! vertico
     (map! :map corfu-map
