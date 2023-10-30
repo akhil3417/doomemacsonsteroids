@@ -1,5 +1,8 @@
 ;;; completion/corfu/config.el -*- lexical-binding: t; -*-
 
+(defvar +corfu-buffer-scanning-size-limit (* 1 1024 1024) ; 1 MB
+  "Size limit for a buffer to be scanned by `cape-dabbrev'.")
+
 ;;
 ;;; Packages
 (use-package! corfu
@@ -19,7 +22,7 @@
                              t)
         corfu-cycle t
         corfu-separator (when (modulep! +orderless) ?\s)
-        corfu-preselect 'valid
+        corfu-preselect (if (modulep! +tng) 'prompt 'valid)
         corfu-count 16
         corfu-max-width 120
         corfu-preview-current 'insert
@@ -41,6 +44,13 @@
   (map! :unless (modulep! :editor evil)
         :map corfu-mode-map
         "C-M-i" #'completion-at-point)
+
+  (add-hook! 'minibuffer-setup-hook
+    (defun +corfu-enable-in-minibuffer ()
+      "Enable Corfu in the minibuffer if `completion-at-point' is bound."
+      (when (where-is-internal #'completion-at-point (list (current-local-map)))
+        (setq-local corfu-echo-delay nil)
+        (corfu-mode +1))))
 
   (after! evil
     (add-hook 'evil-insert-state-exit-hook #'corfu-quit))
@@ -79,10 +89,67 @@
   :init
   (add-hook! prog-mode
     (defun +corfu-add-cape-file-h ()
-      (add-to-list 'completion-at-point-functions #'cape-file)))
+      (add-hook 'completion-at-point-functions #'cape-file -10 t)))
   (add-hook! (org-mode markdown-mode)
     (defun +corfu-add-cape-elisp-block-h ()
-      (add-to-list 'completion-at-point-functions #'cape-elisp-block)))
+      (add-hook 'completion-at-point-functions #'cape-elisp-block 0 t)))
+  ;; Enable Dabbrev completion basically everywhere as a fallback.
+  (when (modulep! +dabbrev)
+    ;; Set up `cape-dabbrev' options.
+    (defun +dabbrev-friend-buffer-p (other-buffer)
+      (< (buffer-size other-buffer) +corfu-buffer-scanning-size-limit))
+    (after! dabbrev
+      (setq cape-dabbrev-check-other-buffers t
+            dabbrev-friend-buffer-function #'+dabbrev-friend-buffer-p
+            dabbrev-ignored-buffer-regexps
+            '("^ "
+              "\\(TAGS\\|tags\\|ETAGS\\|etags\\|GTAGS\\|GRTAGS\\|GPATH\\)\\(<[0-9]+>\\)?")
+            dabbrev-upcase-means-case-search t)
+      (add-to-list 'dabbrev-ignored-buffer-modes 'pdf-view-mode)
+
+      (add-hook! (prog-mode text-mode conf-mode comint-mode minibuffer-setup
+                            eshell-mode)
+        (defun +corfu-add-cape-dabbrev-h ()
+          (add-hook 'completion-at-point-functions #'cape-dabbrev 20 t)))))
+  ;; Complete emojis :).
+  (when (and (modulep! +emoji) (> emacs-major-version 28))
+    (add-hook! (prog-mode conf-mode)
+      (defun +corfu-add-cape-emoji-h ()
+        (add-hook 'completion-at-point-functions
+                  (cape-capf-inside-faces
+                   (cape-capf-prefix-length #'cape-emoji 1)
+                   ;; Only call inside comments and docstrings.
+                   'tree-sitter-hl-face:doc 'font-lock-doc-face
+                   'font-lock-comment-face 'tree-sitter-hl-face:comment)
+                  10 t)))
+    (add-hook! text-mode
+      (defun +corfu-add-cape-emoji-text-h ()
+        (add-hook 'completion-at-point-functions
+                  (cape-capf-prefix-length #'cape-emoji 1) 10 t))))
+  ;; Enable dictionary-based autocompletion.
+  (when (modulep! +dict)
+    (add-hook! (prog-mode conf-mode)
+      (defun +corfu-add-cape-dict-h ()
+        (add-hook 'completion-at-point-functions
+                  (cape-capf-inside-faces
+                   ;; Only call inside comments and docstrings.
+                   #'cape-dict 'tree-sitter-hl-face:doc 'font-lock-doc-face
+                   'font-lock-comment-face 'tree-sitter-hl-face:comment)
+                  40 t)))
+    (add-hook! text-mode
+      (defun +corfu-add-cape-dict-text-h ()
+        (add-hook 'completion-at-point-functions #'cape-dict 40 t))))
+
+  ;; Make these capfs composable.
+  (advice-add #'comint-completion-at-point :around #'cape-wrap-nonexclusive)
+  (advice-add #'eglot-completion-at-point :around #'cape-wrap-nonexclusive)
+  (advice-add #'lsp-completion-at-point :around #'cape-wrap-nonexclusive)
+  (advice-add #'pcomplete-completions-at-point :around #'cape-wrap-nonexclusive)
+  ;; From the `cape' readme. Without this, Eshell autocompletion is broken on
+  ;; Emacs28.
+  (when (< emacs-major-version 29)
+    (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-silent)
+    (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-purify))
   (advice-add #'lsp-completion-at-point :around #'cape-wrap-noninterruptible))
 
 (use-package! yasnippet-capf
