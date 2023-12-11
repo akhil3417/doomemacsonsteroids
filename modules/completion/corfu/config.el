@@ -34,17 +34,6 @@
         tab-always-indent (if (modulep! +tng) 'complete tab-always-indent))
   (add-to-list 'completion-category-overrides `(lsp-capf (styles ,@completion-styles)))
 
-  (map! :map corfu-mode-map
-        :e "C-M-i" #'completion-at-point
-        :i "C-SPC" #'completion-at-point
-        :n "C-SPC" (cmd! (call-interactively #'evil-insert-state)
-                         (call-interactively #'completion-at-point))
-        :v "C-SPC" (cmd! (call-interactively #'evil-change)
-                         (call-interactively #'completion-at-point)))
-  (map! :unless (modulep! :editor evil)
-        :map corfu-mode-map
-        "C-M-i" #'completion-at-point)
-
   (add-hook! 'minibuffer-setup-hook
     (defun +corfu-enable-in-minibuffer ()
       "Enable Corfu in the minibuffer if `completion-at-point' is bound."
@@ -58,32 +47,9 @@
   (when (modulep! +icons)
     (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
 
-  (let ((cmds-del (cmds! (and (modulep! +tng)
-                              (> corfu--index -1)
-                              (eq corfu-preview-current 'insert))
-                         #'corfu-reset)))
-    (map! :map corfu-map
-          [return] #'corfu-insert
-          "RET" #'corfu-insert
-          (:when (modulep! +orderless)
-            "<remap> <completion-at-point>" #'+corfu-smart-sep-toggle-escape)
-          (:when (modulep! +tng)
-            [tab] #'corfu-next
-            [backtab] #'corfu-previous
-            "TAB" #'corfu-next
-            "S-TAB" #'corfu-previous
-            [backspace] cmds-del
-            "DEL" cmds-del)))
-
   (when (modulep! +orderless)
     (after! orderless
-      (setq orderless-component-separator #'orderless-escapable-split-on-space)))
-
-  (after! vertico
-    (map! :map corfu-map
-          "M-m" #'+corfu-move-to-minibuffer
-          (:when (modulep! :editor evil)
-            "M-J" #'+corfu-move-to-minibuffer))))
+      (setq orderless-component-separator #'orderless-escapable-split-on-space))))
 
 (use-package! cape
   :defer t
@@ -177,16 +143,4 @@
 (use-package! corfu-popupinfo
   :hook ((corfu-mode . corfu-popupinfo-mode))
   :config
-  (setq corfu-popupinfo-delay '(0.5 . 1.0))
-  (map! :map corfu-map
-        "C-<up>" #'corfu-popupinfo-scroll-down
-        "C-<down>" #'corfu-popupinfo-scroll-up
-        "C-S-p" #'corfu-popupinfo-scroll-down
-        "C-S-n" #'corfu-popupinfo-scroll-up
-        "C-h" #'corfu-popupinfo-toggle)
-  (map! :when (modulep! :editor evil)
-        :map corfu-popupinfo-map
-        ;; Reversed because popupinfo assumes opposite of what feels intuitive
-        ;; with evil.
-        "C-S-k" #'corfu-popupinfo-scroll-down
-        "C-S-j" #'corfu-popupinfo-scroll-up))
+  (setq corfu-popupinfo-delay '(0.5 . 1.0)))
