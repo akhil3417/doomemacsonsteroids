@@ -511,7 +511,7 @@
       "C-x C-b"     #'ibuffer
       "C-x K"       #'doom/kill-this-buffer-in-all-windows
 
-      ;;; company-mode
+      ;;; completion (in-buffer)
       (:when (modulep! :completion company)
        "C-;" #'+company/complete
        (:after company
@@ -536,6 +536,13 @@
         "C-n"        #'company-search-repeat-forward
         "C-p"        #'company-search-repeat-backward
         "C-s"        (cmd! (company-search-abort) (company-filter-candidates))))
+
+      (:when (modulep! :completion corfu)
+       :after corfu
+       (:map corfu-mode-map
+        "C-M-i" #'completion-at-point)
+       (:map corfu-popupinfo-map
+         "C-S-h" #'corfu-popupinfo-toggle))
 
       ;;; ein notebooks
       (:after ein:notebook-multilang
