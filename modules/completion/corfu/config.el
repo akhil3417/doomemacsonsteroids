@@ -1,26 +1,31 @@
 ;;; completion/corfu/config.el -*- lexical-binding: t; -*-
 
+(defvar +corfu-buffer-scanning-size-limit (* 1 1024 1024) ; 1 MB
+  "Size limit for a buffer to be scanned by `cape-line' or `cape-dabbrev'.
+
+As an exception, `cape-line' will also scan buffers with the same
+major mode regardless of size.")
+
 ;;
 ;;; Packages
 (use-package! corfu
-  :hook (doom-first-buffer . global-corfu-mode)
+  :defer t
   :init
-  ;; Auto-completion settings, must be set before calling `global-corfu-mode'.
-  ;; Due to lazy-loading, setting them in config.el works too.
+  (global-corfu-mode)
+  :config
   (setq corfu-auto t
         corfu-auto-delay 0.1
         corfu-auto-prefix 2
-        corfu-excluded-modes '(erc-mode
-                               circe-mode
-                               help-mode
-                               gud-mode
-                               vterm-mode))
-  :config
-  (add-to-list 'completion-styles 'partial-completion t)
-  (add-to-list 'completion-styles 'initials t)
-  (setq corfu-cycle t
+        global-corfu-modes '((not
+                              erc-mode
+                              circe-mode
+                              help-mode
+                              gud-mode
+                              vterm-mode)
+                             t)
+        corfu-cycle t
         corfu-separator (when (modulep! +orderless) ?\s)
-        corfu-preselect t
+        corfu-preselect (if (modulep! +tng) 'prompt 'valid)
         corfu-count 16
         corfu-max-width 120
         corfu-preview-current 'insert
@@ -30,118 +35,121 @@
         ;; In the case of +tng, TAB should be smart regarding completion;
         ;; However, it should otherwise behave like normal, whatever normal was.
         tab-always-indent (if (modulep! +tng) 'complete tab-always-indent))
+  (add-to-list 'completion-category-overrides `(lsp-capf (styles ,@completion-styles)))
+
+  (add-hook! corfu-mode
+    (defun +corfu-mode-unbinds ()
+      ;; In `corfu-mode', unbind C-SPC from `global-map', so Emacs keeps searching.
+      (make-local-variable 'global-map)
+      (unbind-key "C-SPC" 'global-map)))
+
+  (add-hook! 'minibuffer-setup-hook
+    (defun +corfu-enable-in-minibuffer ()
+      "Enable Corfu in the minibuffer if `completion-at-point' is bound."
+      (when (where-is-internal #'completion-at-point (list (current-local-map)))
+        (setq-local corfu-echo-delay nil)
+        (corfu-mode +1))))
+
+  (after! evil
+    (add-hook 'evil-insert-state-exit-hook #'corfu-quit))
+
+  (when (modulep! +icons)
+    (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
+
   (when (modulep! +orderless)
-    (cond ((modulep! :tools lsp +eglot) (add-to-list 'completion-category-overrides '(eglot (styles orderless))))
-          ((modulep! :tools lsp) (add-hook 'lsp-completion-mode-hook
-                                           (defun doom--use-orderless-lsp-capf ()
-                                             (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
-                                                   '(orderless)))))))
-  (map! (:unless (modulep! +tng)
-          "C-SPC" #'completion-at-point)
-        (:map 'corfu-map
-              (:when (modulep! +orderless)
-                "C-SPC" #'corfu-insert-separator)
-              (:when (modulep! +tng)
-                [tab] #'corfu-next
-                [backtab] #'corfu-previous
-                "TAB" #'corfu-next
-                "S-TAB" #'corfu-previous)))
-
-  (when (modulep! :editor evil)
-    (evil-collection-define-key 'insert 'corfu-map
-      (kbd "RET") #'corfu-insert
-      [return] #'corfu-insert))
-
-  (after! vertico
-    ;; Taken from corfu's README.
-    ;; TODO: extend this to other completion front-ends.
-    (defun corfu-move-to-minibuffer ()
-      (interactive)
-      (let ((completion-extra-properties corfu--extra)
-            (completion-cycle-threshold completion-cycling))
-        (apply #'consult-completion-in-region completion-in-region--data)))
-    (map! :map 'corfu-map "s-<down>" #'corfu-move-to-minibuffer
-          (:when (modulep! :editor evil) "s-j" #'corfu-move-to-minibuffer))))
+    (after! orderless
+      (setq orderless-component-separator #'orderless-escapable-split-on-space))))
 
 (use-package! cape
-  :after corfu
-  :config
-  (add-hook 'prog-mode-hook
-            (lambda () (add-to-list 'completion-at-point-functions #'cape-file)))
-  (add-hook! (markdown-mode org-mode)
-    (lambda () (add-to-list 'completion-at-point-functions #'cape-elisp-block))))
+  :defer t
+  :init
+  (add-hook! prog-mode
+    (defun +corfu-add-cape-file-h ()
+      (add-hook 'completion-at-point-functions #'cape-file -10 t)))
+  (add-hook! (org-mode markdown-mode)
+    (defun +corfu-add-cape-elisp-block-h ()
+      (add-hook 'completion-at-point-functions #'cape-elisp-block 0 t)))
+  ;; Enable Dabbrev completion basically everywhere as a fallback.
+  (when (modulep! +dabbrev)
+    ;; Set up `cape-dabbrev' options.
+    (defun +dabbrev-friend-buffer-p (other-buffer)
+      (< (buffer-size other-buffer) +corfu-buffer-scanning-size-limit))
+    (after! dabbrev
+      (setq cape-dabbrev-check-other-buffers t
+            dabbrev-friend-buffer-function #'+dabbrev-friend-buffer-p
+            dabbrev-ignored-buffer-regexps
+            '("^ "
+              "\\(TAGS\\|tags\\|ETAGS\\|etags\\|GTAGS\\|GRTAGS\\|GPATH\\)\\(<[0-9]+>\\)?")
+            dabbrev-upcase-means-case-search t)
+      (add-to-list 'dabbrev-ignored-buffer-modes 'pdf-view-mode)
+
+      (add-hook! (prog-mode text-mode conf-mode comint-mode minibuffer-setup
+                            eshell-mode)
+        (defun +corfu-add-cape-dabbrev-h ()
+          (add-hook 'completion-at-point-functions #'cape-dabbrev 20 t)))))
+  ;; Complete emojis :).
+  (when (and (modulep! +emoji) (> emacs-major-version 28))
+    (add-hook! (prog-mode conf-mode)
+      (defun +corfu-add-cape-emoji-h ()
+        (add-hook 'completion-at-point-functions
+                  (cape-capf-inside-faces
+                   (cape-capf-prefix-length #'cape-emoji 1)
+                   ;; Only call inside comments and docstrings.
+                   'tree-sitter-hl-face:doc 'font-lock-doc-face
+                   'font-lock-comment-face 'tree-sitter-hl-face:comment)
+                  10 t)))
+    (add-hook! text-mode
+      (defun +corfu-add-cape-emoji-text-h ()
+        (add-hook 'completion-at-point-functions
+                  (cape-capf-prefix-length #'cape-emoji 1) 10 t))))
+  ;; Enable dictionary-based autocompletion.
+  (when (modulep! +dict)
+    (add-hook! (prog-mode conf-mode)
+      (defun +corfu-add-cape-dict-h ()
+        (add-hook 'completion-at-point-functions
+                  (cape-capf-inside-faces
+                   ;; Only call inside comments and docstrings.
+                   #'cape-dict 'tree-sitter-hl-face:doc 'font-lock-doc-face
+                   'font-lock-comment-face 'tree-sitter-hl-face:comment)
+                  40 t)))
+    (add-hook! text-mode
+      (defun +corfu-add-cape-dict-text-h ()
+        (add-hook 'completion-at-point-functions #'cape-dict 40 t))))
+
+  ;; Make these capfs composable.
+  (advice-add #'comint-completion-at-point :around #'cape-wrap-nonexclusive)
+  (advice-add #'eglot-completion-at-point :around #'cape-wrap-nonexclusive)
+  (advice-add #'lsp-completion-at-point :around #'cape-wrap-nonexclusive)
+  (advice-add #'pcomplete-completions-at-point :around #'cape-wrap-nonexclusive)
+  ;; From the `cape' readme. Without this, Eshell autocompletion is broken on
+  ;; Emacs28.
+  (when (< emacs-major-version 29)
+    (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-silent)
+    (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-purify))
+  (advice-add #'lsp-completion-at-point :around #'cape-wrap-noninterruptible))
 
 (use-package! yasnippet-capf
-  :after corfu
-  :config
-  (add-hook 'yas-minor-mode-hook
-            (lambda () (add-to-list 'completion-at-point-functions #'yasnippet-capf))))
-
-(use-package! svg-lib
-  :after kind-icon)
-(use-package! kind-icon
-  :commands (kind-icon-margin-formatter
-             kind-icon-reset-cache
-             kind-icon-formatted)
+  :when (modulep! :editor snippets)
+  :defer t
   :init
-  (add-hook 'corfu-margin-formatters #'kind-icon-margin-formatter)
-  :config
-  (defface corfu-kind-icon '((t :inherit corfu-default))
-    "Face for the icons in the corfu popup.
-For changing color, you should probably use `kind-icon-mapping', which see. The
-purpose here is overriding size and helping with scaling issues."
-    :group 'corfu)
-  (setq kind-icon-default-face 'corfu-kind-icon
-        kind-icon-blend-background t
-        kind-icon-blend-frac 0.2)
-  (let ((def-style (svg-lib-style-compute-default 'corfu-kind-icon))
-        res)
-    (cl-loop for (key value) on def-style by 'cddr
-             do (unless (member key '(:foreground
-                                      :background
-                                      :font-size
-                                      :font-width
-                                      :font-weight
-                                      :font-family
-                                      :width))
-                  (setq res (plist-put res key value))))
-    (setq kind-icon-default-style (plist-put res :stroke 0.25)))
-  (defadvice! doom--kind-icon-remove-padding (orig kind)
-    "Rescale icon images to 1, and set surrounding spaces to width 0.
-This fixes the cropping due to scaling issues."
-    :around #'kind-icon-formatted
-    (let* ((text (funcall orig kind))
-           (image (get-text-property 1 'display text)))
-      (when (eq (car-safe image) 'image)
-        (setf (image-property image :scale) 1)
-        (put-text-property 0 1 'display '(space :width (0)) text)
-        (put-text-property 2 3 'display '(space :width (0)) text))
-      text)))
+  (add-hook! 'yas-minor-mode-hook
+    (defun +corfu-add-yasnippet-capf-h ()
+      (add-hook 'completion-at-point-functions #'yasnippet-capf 30 t))))
 
 (use-package! corfu-terminal
   :when (not (display-graphic-p))
-  :hook (corfu-mode . corfu-terminal-mode))
+  :hook ((corfu-mode . corfu-terminal-mode)))
 
 ;;
 ;;; Extensions
+
 (use-package! corfu-history
-  :after savehist
-  :hook (corfu-mode . corfu-history-mode)
+  :hook ((corfu-mode . corfu-history-mode))
   :config
-  (add-to-list 'savehist-additional-variables 'corfu-history))
+  (after! savehist (add-to-list 'savehist-additional-variables 'corfu-history)))
+
+
 (use-package! corfu-popupinfo
-  :hook (corfu-mode . corfu-popupinfo-mode)
+  :hook ((corfu-mode . corfu-popupinfo-mode))
   :config
-  (setq corfu-popupinfo-delay '(0.5 . 1.0))
-  (map! (:map 'corfu-map
-              "C-<up>" #'corfu-popupinfo-scroll-down
-              "C-<down>" #'corfu-popupinfo-scroll-up
-              "C-S-p" #'corfu-popupinfo-scroll-down
-              "C-S-n" #'corfu-popupinfo-scroll-up
-              "C-h" #'corfu-popupinfo-toggle)
-        (:map 'corfu-popupinfo-map
-         :when (modulep! :editor evil)
-         ;; Reversed because popupinfo assumes opposite of what feels intuitive
-         ;; with evil.
-         "C-S-k" #'corfu-popupinfo-scroll-down
-         "C-S-j" #'corfu-popupinfo-scroll-up)))
+  (setq corfu-popupinfo-delay '(0.5 . 1.0)))
