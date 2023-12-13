@@ -1,14 +1,13 @@
 ;; -*- no-byte-compile: t; -*-
 ;;; completion/corfu/packages.el
 
-(package! corfu :recipe (:files ("*.el" "extensions/*.el")) :pin "a4f003605bc712952e5f2fc27d87730c312fdbeb")
-(package! cape :pin "5b28cd43f2efa19dbf5053f164cce622a4b5bdae")
+(package! corfu :pin "24dccafeea114b1aec7118f2a8405b46aa0051e0")
+(package! cape :pin "18a30f48bb8754421cb10dad99e0a406173d4551")
 (when (modulep! +icons)
-  (package! svg-lib :pin "b2a168482f85a308a4ab95c03e3c2bd71981e166")
-  (package! kind-icon :pin "b0fb83be6ff6837446274e44e799ade836854a39"))
+  (package! nerd-icons-corfu :pin "7077bb76fefc15aed967476406a19dc5c2500b3c"))
 (when (modulep! +orderless)
-  (package! orderless :pin "e6784026717a8a6a7dcd0bf31fd3414f148c542e"))
+  (package! orderless :pin "b24748093b00b37c3a572c4909f61c08fa27504f"))
 (when (modulep! :os tty)
-  (package! corfu-terminal :pin "5ce4c11b8efd4d2fd1b404b9422bb85b05476da0"))
+  (package! corfu-terminal :pin "501548c3d51f926c687e8cd838c5865ec45d03cc"))
 (when (modulep! :editor snippets)
-  (package! yasnippet-capf :pin "40654214db7a44db3a99321447632b43a10fae57"))
+  (package! yasnippet-capf :pin "a0a6b1c2bb6decdad5cf9b74202f0042f494a6ab"))
