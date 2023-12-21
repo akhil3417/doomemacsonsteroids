@@ -89,6 +89,8 @@ is visible, the following relevant keys are available:
 | [[kbd:][M-m]]      | Export to minibuffer (if [[doom-module::completion vertico]])        |
 | [[kbd:][M-j]]      | (evil) Export to minibuffer (if [[doom-module::completion vertico]]) |
 | [[kbd:][RET]]      | Insert candidate                                                 |
+| [[kbd:][C-RET]]    | (in minibuffer) Finish minibuffer without inserting candidate    |
+| [[kbd:][S-RET]]    | (in minibuffer) Finish minibuffer after inserting candidate      |
 | [[kbd:][SPC]]      | Quit autocompletion after a wildcard or pass-through             |
 | [[kbd:][C-SPC]]    | Complete (unless [[doom-module::completion corfu +tng]])             |
 | [[kbd:][C-SPC]]    | (when completing) Insert separator DWIM (see below)              |

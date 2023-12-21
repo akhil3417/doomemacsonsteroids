@@ -475,8 +475,12 @@ Continues comments if executed from a commented line. Consults
          "C-S-p" #'corfu-popupinfo-scroll-down
          "C-S-n" #'corfu-popupinfo-scroll-up
          "C-S-u" (cmd! (funcall-interactively #'corfu-popupinfo-scroll-down corfu-popupinfo-min-height))
-         "C-S-d" (cmd! (funcall-interactively #'corfu-popupinfo-scroll-up corfu-popupinfo-min-height))))
-
+         "C-S-d" (cmd! (funcall-interactively #'corfu-popupinfo-scroll-up corfu-popupinfo-min-height)))
+        (:map corfu-map
+         :gi "C-<return>" '(menu-item "Conclude the minibuffer" exit-minibuffer
+                            :enable (active-minibuffer-window))
+         :gi "S-<return>" '(menu-item "Insert completion and conclude" +corfu-complete-and-exit-minibuffer
+                            :enable (active-minibuffer-window))))
   (when-let ((cmds-del (and (modulep! :completion corfu +tng)
                             (cmds! (and (> corfu--index -1)
                                         (eq corfu-preview-current 'insert))

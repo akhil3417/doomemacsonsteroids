@@ -1,6 +1,14 @@
 ;;; completion/corfu/autoload.el -*- lexical-binding: t; -*-
 
 ;;;###autoload
+(defun +corfu-complete-and-exit-minibuffer ()
+  (interactive)
+  (if (>= corfu--index 0)
+      (corfu-complete)
+    (corfu-insert))
+  (exit-minibuffer))
+
+;;;###autoload
 (defun +corfu-move-to-minibuffer ()
   ;; Taken from corfu's README.
   ;; TODO: extend this to other completion front-ends.
