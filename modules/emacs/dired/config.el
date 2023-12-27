@@ -3,11 +3,16 @@
 (use-package! dired
   :commands dired-jump
   :init
+  (dirvish-override-dired-mode)
   (setq dired-dwim-target t  ; suggest a target for moving/copying intelligently
         ;; don't prompt to revert, just do it
         dired-auto-revert-buffer #'dired-buffer-stale-p
         ;; Always copy/delete recursively
         dired-recursive-copies  'always
+        ;; Emacs 29 added mouse drag-and-drop support for Dired, the following settings will enable i
+        dired-mouse-drag-files  t
+        mouse-drag-and-drop-region-cross-program t
+
         dired-recursive-deletes 'top
         ;; Ask whether destination dirs should get created when copying/removing files.
         dired-create-destination-dirs 'ask
@@ -147,3 +152,14 @@
     (push 'vc-state dirvish-attributes))
   (when (modulep! +icons)
     (appendq! dirvish-attributes '(all-the-icons subtree-state))))
+
+;; Some keybindings for mouse:
+;;     left click: expanding/collapsing a directory or opening a file
+;;     right click: opening a file/directory
+;;     middle click: opening a file/directory in new window
+
+(setq mouse-1-click-follows-link nil)
+(define-key dirvish-mode-map (kbd "<mouse-1>") 'dirvish-subtree-toggle-or-open)
+(define-key dirvish-mode-map (kbd "<mouse-2>") 'dired-mouse-find-file-other-window)
+(define-key dirvish-mode-map (kbd "<mouse-3>") 'dired-mouse-find-file)
+
