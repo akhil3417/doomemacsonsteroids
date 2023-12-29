@@ -89,6 +89,8 @@ is visible, the following relevant keys are available:
 | [[kbd:][M-m]]      | Export to minibuffer (if [[doom-module::completion vertico]])        |
 | [[kbd:][M-j]]      | (evil) Export to minibuffer (if [[doom-module::completion vertico]]) |
 | [[kbd:][RET]]      | Insert candidate                                                     |
+| [[kbd:][C-RET]]    | (in minibuffer) Finish minibuffer without inserting candidate        |
+| [[kbd:][S-RET]]    | (in minibuffer) Finish minibuffer after inserting candidate          |
 | [[kbd:][SPC]]      | Quit autocompletion after a wildcard or pass-through                 |
 | [[kbd:][C-SPC]]    | Complete (unless [[doom-module::completion corfu +tng]])             |
 | [[kbd:][C-SPC]]    | (when completing) Insert separator DWIM (see below)                  |
@@ -141,11 +143,9 @@ A few variables may be set to change behavior of this module:
   recommended to leave it at that. Otherwise, single matches on snippet keys
   expand immediately.
 <<<<<<< HEAD
-=======
 - [[var:+corfu-buffer-scanning-size-limit]]  ::
-    Sets the maximum buffer size to be scanned by ~cape-dabbrev~ and
-  ~cape-lines~. Defaults to 1 MB. Set this if you are having performance
-  problems using either CAPF.
+    Sets the maximum buffer size to be scanned by ~cape-dabbrev~. Defaults to 1
+  MB. Set this if you are having performance problems using the CAPF.
 
 ** Adding CAPFs to a mode
 To add other CAPFs on a mode-per-mode basis, put either of the following in your
@@ -160,13 +160,15 @@ To add other CAPFs on a mode-per-mode basis, put either of the following in your
 ~DEPTH~ above is an integer between -100, 100, and defaults to 0 of omitted.  Also
 see ~add-hook!~'s documentation for additional ways to call it. ~add-hook~ only
 accepts the quoted arguments form above.
+<<<<<<< HEAD
 >>>>>>> pullreqs/37
+=======
+>>>>>>> pullreqs/38
 
 * Troubleshooting
 [[doom-report:][Report an issue?]]
 
 <<<<<<< HEAD
-=======
 If you have performance issues with ~cape-dabbrev~, the first thing I recommend
 doing is to look at the list of buffers Dabbrev is scanning:
 
@@ -178,7 +180,10 @@ doing is to look at the list of buffers Dabbrev is scanning:
 ... and modify ~dabbrev-ignored-buffer-regexps~ or ~dabbrev-ignored-buffer-modes~
 accordingly.
 
+<<<<<<< HEAD
 >>>>>>> pullreqs/37
+=======
+>>>>>>> pullreqs/38
 * Frequently asked questions
 /This module has no FAQs yet./ [[doom-suggest-faq:][Ask one?]]
 

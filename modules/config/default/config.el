@@ -456,18 +456,18 @@ Continues comments if executed from a commented line. Consults
   (map! :when (modulep! :completion corfu)
         :after corfu
         (:map corfu-map
-         [return] #'corfu-insert
-         "RET" #'corfu-insert
-         "C-s" #'+corfu-move-to-minibuffer
-         "C-p" #'corfu-previous
-         "C-n" #'corfu-next
-         (:when (modulep! :completion corfu +orderless)
-          "<remap> <completion-at-point>" #'+corfu-smart-sep-toggle-escape)
-         (:when (modulep! :completion corfu +tng)
-          [tab] #'corfu-next
-          "TAB" #'corfu-next
-          [backtab] #'corfu-previous
-          "S-TAB" #'corfu-previous))
+              [return] #'corfu-insert
+              "RET" #'corfu-insert
+              "C-s" #'+corfu-move-to-minibuffer
+              "C-p" #'corfu-previous
+              "C-n" #'corfu-next
+              (:when (modulep! :completion corfu +orderless)
+                "<remap> <completion-at-point>" #'+corfu-smart-sep-toggle-escape)
+              (:when (modulep! :completion corfu +tng)
+                [tab] #'corfu-next
+                "TAB" #'corfu-next
+                [backtab] #'corfu-previous
+                "S-TAB" #'corfu-previous))
         (:after corfu-popupinfo
          :map corfu-popupinfo-map
          "C-<up>" #'corfu-popupinfo-scroll-down
@@ -475,8 +475,12 @@ Continues comments if executed from a commented line. Consults
          "C-S-p" #'corfu-popupinfo-scroll-down
          "C-S-n" #'corfu-popupinfo-scroll-up
          "C-S-u" (cmd! (funcall-interactively #'corfu-popupinfo-scroll-down corfu-popupinfo-min-height))
-         "C-S-d" (cmd! (funcall-interactively #'corfu-popupinfo-scroll-up corfu-popupinfo-min-height))))
-
+         "C-S-d" (cmd! (funcall-interactively #'corfu-popupinfo-scroll-up corfu-popupinfo-min-height)))
+        (:map corfu-map
+         :gi "C-<return>" '(menu-item "Conclude the minibuffer" exit-minibuffer
+                            :enable (active-minibuffer-window))
+         :gi "S-<return>" '(menu-item "Insert completion and conclude" +corfu-complete-and-exit-minibuffer
+                            :enable (active-minibuffer-window))))
   (when-let ((cmds-del (and (modulep! :completion corfu +tng)
                             (cmds! (and (> corfu--index -1)
                                         (eq corfu-preview-current 'insert))
@@ -516,10 +520,10 @@ Continues comments if executed from a commented line. Consults
         :gn [C-S-return]    #'+default/newline-above
 
         (:when IS-MAC
-         :gn "s-RET"        #'+default/newline-below
-         :gn [s-return]     #'+default/newline-below
-         :gn "S-s-RET"      #'+default/newline-above
-         :gn [S-s-return]   #'+default/newline-above)))
+          :gn "s-RET"        #'+default/newline-below
+          :gn [s-return]     #'+default/newline-below
+          :gn "S-s-RET"      #'+default/newline-above
+          :gn [S-s-return]   #'+default/newline-above)))
 
 
 ;;

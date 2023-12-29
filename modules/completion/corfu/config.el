@@ -1,10 +1,7 @@
 ;;; completion/corfu/config.el -*- lexical-binding: t; -*-
 
 (defvar +corfu-buffer-scanning-size-limit (* 1 1024 1024) ; 1 MB
-  "Size limit for a buffer to be scanned by `cape-line' or `cape-dabbrev'.
-
-As an exception, `cape-line' will also scan buffers with the same
-major mode regardless of size.")
+  "Size limit for a buffer to be scanned by `cape-dabbrev'.")
 
 ;;
 ;;; Packages
@@ -36,12 +33,6 @@ major mode regardless of size.")
         ;; However, it should otherwise behave like normal, whatever normal was.
         tab-always-indent (if (modulep! +tng) 'complete tab-always-indent))
   (add-to-list 'completion-category-overrides `(lsp-capf (styles ,@completion-styles)))
-
-  (add-hook! corfu-mode
-    (defun +corfu-mode-unbinds ()
-      ;; In `corfu-mode', unbind C-SPC from `global-map', so Emacs keeps searching.
-      (make-local-variable 'global-map)
-      (unbind-key "C-SPC" 'global-map)))
 
   (add-hook! 'minibuffer-setup-hook
     (defun +corfu-enable-in-minibuffer ()
