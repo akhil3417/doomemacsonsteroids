@@ -259,3 +259,19 @@ targets."
 (defun +vertico-basic-remote-all-completions (string table pred point)
   (and (vertico--remote-p string)
        (completion-basic-all-completions string table pred point)))
+
+;;;###autoload
+(defun +vertico-quick-insert ()
+  "Select a candidate and exit"
+  (interactive)
+  (when (vertico-quick-jump)
+    (vertico-insert)
+    (minibuffer-complete-and-exit)
+    ))
+
+;;;###autoload
+(defun +vertico-quick-embark (&optional arg)
+  "Embark on candidate using quick keys."
+  (interactive)
+  (when (vertico-quick-jump)
+    (embark-act arg)))
