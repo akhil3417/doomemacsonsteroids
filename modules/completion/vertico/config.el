@@ -77,6 +77,111 @@ overrides `completion-styles' during company completion sessions.")
     (letf! ((#'minibuffer-completion-help #'ignore))
       (apply fn args))))
 
+(use-package! vertico-multiform
+  :commands vertico-multiform-mode
+  :after vertico-flat
+  ;; :bind (:map vertico-map
+  ;;             ("M-q" . vertico-multiform-grid)
+  ;;             ("C-l" . vertico-multiform-reverse)
+  ;;             ("C-M-l" . embark-export))
+  :init (vertico-multiform-mode 1)
+  ;; :init (vertico-reverse-mode 1)
+  :config
+  (setq vertico-multiform-categories
+        '((file my/vertico-grid-mode reverse)
+          (jinx grid (vertico-grid-annotate . 20))
+          (project-file my/vertico-grid-mode reverse)
+          (imenu buffer)
+          (consult-location buffer)
+          (consult-grep buffer)
+          (notmuch-result reverse)
+          (minor-mode reverse)
+          (reftex-label (:not unobtrusive))
+          (embark-keybinding grid)
+          (citar-reference reverse)
+          (xref-location reverse)
+          (history reverse)
+          (url reverse)
+          (consult-info buffer)
+          (kill-ring reverse)
+          (consult-compile-error reverse)
+          (buffer flat (vertico-cycle . t))
+          (t flat)))
+  (setq vertico-multiform-commands
+        '((jinx-correct reverse)
+          (tab-bookmark-open reverse)
+          (dired-goto-file unobtrusive)
+          (load-theme my/vertico-grid-mode reverse)
+          (consult-theme my/vertico-grid-mode reverse)
+          (my/toggle-theme my/vertico-grid-mode reverse)
+          (org-refile reverse)
+          (org-agenda-refile reverse)
+          (org-capture-refile reverse)
+          (affe-find reverse)
+          (execute-extended-command unobtrusive)
+          (dired-goto-file flat)
+          (consult-project-buffer flat)
+          (consult-dir-maybe reverse)
+          (consult-dir reverse)
+          (consult-flymake reverse)
+          (consult-history reverse)
+          (consult-completion-in-region reverse)
+          (consult-recoll buffer)
+          (citar-insert-citation reverse)
+          (completion-at-point reverse)
+          (org-roam-node-find reverse)
+          ;; (embark-completing-read-prompter reverse)
+          ;; (embark-act-with-completing-read reverse)
+          ;; (embark-bindings reverse)
+          (consult-org-heading reverse)
+          (consult-dff unobtrusive)
+          (embark-find-definition reverse)
+          (xref-find-definitions reverse)
+          (my/eshell-previous-matching-input reverse)
+          (tmm-menubar reverse)))
+
+  (defun vertico-multiform-unobtrusive ()
+    "Toggle the quiet display."
+    (interactive)
+    (vertico-multiform--define-display-toggle 'vertico-unobtrusive-mode)
+    (if vertico-unobtrusive-mode
+        (vertico-multiform--temporary-mode 'vertico-reverse-mode -1)
+      (vertico-multiform--temporary-mode 'vertico-reverse-mode 1))))
+
+(use-package! vertico-unobtrusive
+  :after vertico-flat)
+
+(use-package! vertico-grid
+  :after vertico
+  ;; :bind (:map vertico-map ("M-q" . vertico-grid-mode))
+  :config
+  (defvar my/vertico-count-orig vertico-count)
+  (define-minor-mode my/vertico-grid-mode
+    "Vertico-grid display with modified row count."
+    :global t :group 'vertico
+    (cond
+     (my/vertico-grid-mode
+      (setq my/vertico-count-orig vertico-count)
+      (setq vertico-count 4)
+      (vertico-grid-mode 1))
+     (t (vertico-grid-mode 0)
+        (setq vertico-count my/vertico-count-orig))))
+  (setq vertico-grid-separator "    ")
+  (setq vertico-grid-lookahead 50))
+
+(after! vertico
+  (require 'vertico-directory)
+  (require 'vertico-repeat)
+  (require 'vertico-reverse)
+  (require 'vertico-flat)
+  (require 'vertico-buffer)
+  :config
+  (defun vertico-quick-embark (&optional arg)
+    "Embark on candidate using quick keys."
+    (interactive)
+    (when (vertico-quick-jump)
+      (embark-act arg)))
+  (setq vertico-buffer-display-action 'display-buffer-reuse-window))
 
 (use-package! orderless
   :after-call doom-first-input-hook
