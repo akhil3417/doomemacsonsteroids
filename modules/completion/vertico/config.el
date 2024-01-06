@@ -43,14 +43,26 @@ overrides `completion-styles' during company completion sessions.")
 
   (map! :when (modulep! :editor evil +everywhere)
         :map vertico-map
+        "M-V"   #'vertico-multiform-vertical
+        "M-q"   #'vertico-multiform-grid
+        "M-F"   #'vertico-multiform-flat
+        "M-R"   #'vertico-multiform-reverse
+        "M-U"   #'vertico-multiform-unobtrusive
+        "C-l"   #'vertico-multiform-reverse
         "M-RET" #'vertico-exit-input
+        "C-o"   #'vertico-quick-embark
+        "M-i"   #'+vertico-quick-insert
         "C-SPC" #'+vertico/embark-preview
         "C-j"   #'vertico-next
         "C-M-j" #'vertico-next-group
+        "DEL"   #' vertico-directory-delete-char
+        "M-DEL" #' vertico-directory-delete-word
+        "C-w"   #' vertico-directory-delete-word
+        "RET"   #' vertico-directory-enter
         "C-k"   #'vertico-previous
         "C-M-k" #'vertico-previous-group
         "C-h" (cmds! (eq 'file (vertico--metadata-get 'category)) #'vertico-directory-up)
-        "C-l" (cmds! (eq 'file (vertico--metadata-get 'category)) #'+vertico/enter-or-preview))
+        "M-l" (cmds! (eq 'file (vertico--metadata-get 'category)) #'+vertico/enter-or-preview))
 
   ;; Cleans up path when moving directories with shadowed paths syntax, e.g.
   ;; cleans ~/foo/bar/// to /, and ~/foo/bar/~/ to ~/.
