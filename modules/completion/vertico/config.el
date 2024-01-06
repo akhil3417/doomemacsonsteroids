@@ -380,8 +380,12 @@ orderless."
   (map! [remap describe-bindings] #'embark-bindings
         "C-;"               #'embark-act  ; to be moved to :config default if accepted
         (:map minibuffer-local-map
+         "C-a"               #'embark-act-with-completing-read
+         "C-S-o"             #'embark-minimal-act
+         "C-M-o"             #'embark-minimal-act-noexit
+         "C-b"               #'embark-become
          "C-;"               #'embark-act
-         "C-c C-;"           #'embark-export
+         "C-c C-o"           #'embark-export
          "C-c C-l"           #'embark-collect
          :desc "Export to writable buffer" "C-c C-e" #'+vertico/embark-export-write)
         (:leader
@@ -422,9 +426,9 @@ orderless."
   (map! (:map embark-file-map
          :desc "Open target with sudo"        "s"   #'doom/sudo-find-file
          (:when (modulep! :tools magit)
-          :desc "Open magit-status of target" "g"   #'+vertico/embark-magit-status)
+           :desc "Open magit-status of target" "g"   #'+vertico/embark-magit-status)
          (:when (modulep! :ui workspaces)
-          :desc "Open in new workspace"       "TAB" #'+vertico/embark-open-in-new-workspace))))
+           :desc "Open in new workspace"       "TAB" #'+vertico/embark-open-in-new-workspace))))
 
 
 (use-package! marginalia
