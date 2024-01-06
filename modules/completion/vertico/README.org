@@ -30,6 +30,9 @@ like [[doom-package:ivy]] and [[doom-package:helm]] do. The primary packages are
 - +icons ::
   Add icons to =file= and =buffer= category completion selections.
 
+- +multiform ::
+ multiform  mode.
+
 ** Packages
 - [[doom-package:nerd-icons-completion]] if [[doom-module:+icons]]
 - [[doom-package:consult]]
