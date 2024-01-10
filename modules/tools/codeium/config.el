@@ -1,6 +1,7 @@
 ;;; tools/codeium/config.el -*- lexical-binding: t; -*-
 
 (use-package! codeium
+  :bind ("C-c f" . +codeium-complete);; comfy a/q to my keyb layout
   :init
   (when (modulep! :completion corfu)
     (when (featurep! +python)
@@ -27,6 +28,12 @@
   ;; (add-hook 'emacs-startup-hook
   ;;           (lambda () (run-with-timer 0.1 nil #'codeium-init)))
 
+  (defalias '+codeium-complete
+    (cape-capf-interactive #'codeium-completion-at-point))
+  (define-key evil-insert-state-map (kbd "C-f") #'+codeium-complete)
+  ;; (define-key 'normal python-mode-map (kbd "C-f") #'my/codeium-complete)
+  ;; (setq codeium/metadata/api_key
+  ;;       (auth-source-pass-get 'secret "api/codeium"))
   (setq use-dialog-box nil) ;; do not use popup boxes
 
   ;; if you don't want to use customize to save the api-key
@@ -45,19 +52,19 @@
           (memq api '(GetCompletions Heartbeat CancelRequest GetAuthToken RegisterUser auth-redirect AcceptCompletion))))
 
   ;; limiting the string sent to codeium for better performance
-  (defun my-codeium/document/text ()
+  (defun +codeium/document/text ()
     (buffer-substring-no-properties
      (max (- (point) 3000) (point-min))
      (min (+ (point) 1000) (point-max))))
   ;; if you change the text, you should also change the cursor_offset
   ;; warning: this is measured by UTF-8 encoded bytes
-  (defun my-codeium/document/cursor_offset ()
+  (defun +codeium/document/cursor_offset ()
     (codeium-utf8-byte-length
      (buffer-substring-no-properties
       (max (- (point) 3000) (point-min)) (point))))
-  (setq codeium/document/text 'my-codeium/document/text)
+  (setq codeium/document/text '+codeium/document/text)
   (setq codeium/document/cursor_offset
-        'my-codeium/document/cursor_offset))
+        '+codeium/document/cursor_offset))
 
 (when (modulep! :completion company)
   (after! company
