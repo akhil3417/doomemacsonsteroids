@@ -11,7 +11,7 @@
   (global-corfu-mode)
   :config
   (setq corfu-auto t
-        corfu-auto-delay 0.1
+        corfu-auto-delay 0.05
         corfu-auto-prefix 2
         global-corfu-modes '((not
                               erc-mode
@@ -23,7 +23,8 @@
         corfu-cycle t
         corfu-separator (when (modulep! +orderless) ?\s)
         corfu-preselect (if (modulep! +tng) 'prompt 'valid)
-        corfu-count 16
+        corfu-count 8
+        corfu-scroll-margin 2
         corfu-max-width 120
         corfu-preview-current 'insert
         corfu-on-exact-match nil
