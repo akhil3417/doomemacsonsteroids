@@ -5,11 +5,12 @@
   :config
   (add-hook! 'eww-after-render-hook #'eww--rename-buffer)
   (when (featurep! +shrface)
-  (add-hook 'eww-after-render-hook #'shrface-mode))
+    (add-hook 'eww-after-render-hook #'shrface-mode))
   (defadvice! eww-rename-buffer-a ()
     :after #'eww-back-url
     :after #'eww-forward-url
     (eww--rename-buffer))
+
   (setq eww-history-limit 150
         eww-restore-desktop t
         eww-desktop-remove-duplicates t
@@ -19,7 +20,7 @@
         eww-form-checkbox-selected-symbol "[X]"
         eww-form-checkbox-symbol "[ ]"
         eww-retrieve-command nil) ;; NOTE set to 'nil in case it messes up with paragraph spacing
-        ;; eww-retrieve-command '("wget" "--quiet" "--output-document=-")) ;; NOTE set to 'nil in case it messes up with paragraph spacing
+  ;; eww-retrieve-command '("wget" "--quiet" "--output-document=-")) ;; NOTE set to 'nil in case it messes up with paragraph spacing
 
   ;;NOTE following keybinds try to mimic qutebrowser
   (map! :map eww-mode-map
@@ -64,14 +65,14 @@
       (shrface-default-keybindings) ; setup default keybindings
       (setq shrface-bullets-bullet-list '("◉" "○" "✸" "✿" "✤" "✜" "◆" "▶"))
       (setq shrface-href-versatile t)
-    (map! :map eww-mode-map
-          :ni "<tab>"   #'shrface-outline-cycle
-          :n "S-<tab>"  #'shrface-outline-cycle-buffer
-          :n "C-t"      #'shrface-toggle-bullets
-          :n "C-n"      #'shrface-next-headline
-          :n "C-p"      #'shrface-previous-headline
-          :n "M-l"      #'shrface-links-consult  ; or 'shrface-links-helm or 'shrface-links-consult
-          :n "M-h"      #'shrface-headline-consult)))  ; or 'shrface-headline-helm or 'shrface-headline-consult
+      (map! :map eww-mode-map
+            :ni "<tab>"   #'shrface-outline-cycle
+            :n "S-<tab>"  #'shrface-outline-cycle-buffer
+            :n "C-t"      #'shrface-toggle-bullets
+            :n "C-n"      #'shrface-next-headline
+            :n "C-p"      #'shrface-previous-headline
+            :n "M-l"      #'shrface-links-consult  ; or 'shrface-links-helm or 'shrface-links-consult
+            :n "M-h"      #'shrface-headline-consult)))  ; or 'shrface-headline-helm or 'shrface-headline-consult
 
   (when (modulep! +highlight)
     (require 'shr-tag-pre-highlight)
