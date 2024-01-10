@@ -32,7 +32,7 @@ overrides `completion-styles' during company completion sessions.")
           (cdr args)))
   :config
   (setq vertico-resize nil
-        vertico-count 17
+        vertico-count 10
         vertico-cycle t)
   (setq-default completion-in-region-function
                 (lambda (&rest args)
