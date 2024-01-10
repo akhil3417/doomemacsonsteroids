@@ -13,6 +13,8 @@
 
   (setq eww-history-limit 150
         eww-restore-desktop t
+        browse-url-browser-function 'eww-browse-url
+        browse-url-secondary-browser-function 'browse-url-generic
         eww-desktop-remove-duplicates t
         eww-header-line-format nil
         eww-search-prefix "https://duckduckgo.com/html/?q="
