@@ -4,28 +4,29 @@
   :init
   (when (modulep! :completion corfu)
     (when (featurep! +python)
-      ;;   (defalias 'codeium-python-completion
-      ;;     (cape-super-capf #'codeium-completion-at-point #'lsp-completion-at-point #'cape-file #'python-completion-at-point))
-      ;;   (add-hook 'python-mode-hook
-      ;;             (lambda ()
-      ;;               ;; (setq-local codeium/editor_options/tab_size 4)
-      ;;               (setq-local completion-at-point-functions (list #'codeium-python-completion)))))
+      ;; (defalias 'codeium-python-completion
+      ;;   (cape-super-capf #'codeium-completion-at-point #'lsp-completion-at-point #'cape-file #'python-completion-at-point))
+      ;; (add-hook 'python-mode-hook
+      ;;           (lambda ()
+      ;;             ;; (setq-local codeium/editor_options/tab_size 4)
+      ;;             (setq-local completion-at-point-functions (list #'codeium-python-completion)))))
 
       (add-hook 'python-mode-hook
                 (lambda ()
                   (setq-local completion-at-point-functions
                               (cons #'codeium-completion-at-point completion-at-point-functions)))))
 
-      (when (featurep! +cmode)
-        (defalias 'codeium-cmode-completion
-          (cape-super-capf #'lsp-completion-at-point #'codeium-completion-at-point #'tags-completion-at-point-function #'cape-file))
-        (setq-local completion-at-point-functions (list #'codeium-cmode-completion))
-        (add-hook 'c-mode-hook
-                  (lambda ()
-                    (setq-local completion-at-point-functions (list #'(codeium-python-completion)))))))
+    (when (featurep! +cmode)
+      (defalias 'codeium-cmode-completion
+        (cape-super-capf #'lsp-completion-at-point #'codeium-completion-at-point #'tags-completion-at-point-function #'cape-file))
+      (setq-local completion-at-point-functions (list #'codeium-cmode-completion))
+      (add-hook 'c-mode-hook
+                (lambda ()
+                  (setq-local completion-at-point-functions (list #'(codeium-python-completion)))))))
 
-    ;; (add-hook 'emacs-startup-hook
-    ;;           (lambda () (run-with-timer 0.1 nil #'codeium-init)))
+  ;; (add-hook 'emacs-startup-hook
+  ;;           (lambda () (run-with-timer 0.1 nil #'codeium-init)))
+
   (setq use-dialog-box nil) ;; do not use popup boxes
 
   ;; if you don't want to use customize to save the api-key
