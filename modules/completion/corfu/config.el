@@ -35,6 +35,26 @@
         tab-always-indent (if (modulep! +tng) 'complete tab-always-indent))
   (add-to-list 'completion-category-overrides `(lsp-capf (styles ,@completion-styles)))
 
+  (defun +corfu-shell-settings ()
+    (setq-local corfu-quit-no-match t
+                corfu-auto nil)
+    (setq-local corfu-map (copy-keymap corfu-map)
+                completion-cycle-threshold nil)
+    (define-key corfu-map "\r" #'corfu-insert-and-send)
+    (corfu-mode))
+
+  (defun corfu-insert-and-send ()
+    (interactive)
+    ;; 1. First insert the completed candidate
+    (corfu-insert)
+    ;; 2. Send the entire prompt input to the shell
+    (cond
+     ((and (derived-mode-p 'eshell-mode) (fboundp 'eshell-send-input))
+      (eshell-send-input))
+     ((derived-mode-p 'comint-mode)
+      (comint-send-input))))
+
+  (add-hook! (shell-mode eshell-mode) #'+corfu-shell-settings)
   (add-hook! 'minibuffer-setup-hook
     (defun +corfu-enable-in-minibuffer ()
       "Enable Corfu in the minibuffer if `completion-at-point' is bound."
