@@ -3,14 +3,13 @@
 (use-package! codeium
   :bind ("C-c f" . +codeium-complete);; comfy a/q to my keyb layout
   :init
+  ;; (add-hook 'prog-mode-hook
+  ;;           (lambda ()
+  ;;             (add-hook 'completion-at-point-functions
+  ;;                       #'codeium-completion-at-point
+  ;;                       -40 t)))
   (when (modulep! :completion corfu)
     (when (featurep! +python)
-      ;; (defalias 'codeium-python-completion
-      ;;   (cape-super-capf #'codeium-completion-at-point #'lsp-completion-at-point #'cape-file #'python-completion-at-point))
-      ;; (add-hook 'python-mode-hook
-      ;;           (lambda ()
-      ;;             ;; (setq-local codeium/editor_options/tab_size 4)
-      ;;             (setq-local completion-at-point-functions (list #'codeium-python-completion)))))
 
       (add-hook 'python-mode-hook
                 (lambda ()
@@ -28,6 +27,8 @@
   ;; (add-hook 'emacs-startup-hook
   ;;           (lambda () (run-with-timer 0.1 nil #'codeium-init)))
 
+  :defer t
+  :config
   (defalias '+codeium-complete
     (cape-capf-interactive #'codeium-completion-at-point))
   (define-key evil-insert-state-map (kbd "C-f") #'+codeium-complete)
@@ -77,3 +78,4 @@
         (:prefix ("c " . "")
          :desc "Add/Remove Codeium Completion " "m" #'add-codeium-completion )))
 
+(provide 'setup-codeium)
