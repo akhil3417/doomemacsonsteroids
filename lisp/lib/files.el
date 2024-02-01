@@ -220,7 +220,7 @@ single file or nested compound statement of `and' and `or' statements."
              (let* ((buffer-file-name (doom-path ,file))
                     (coding-system-for-read  (or ,coding 'binary))
                     (coding-system-for-write (or coding-system-for-write coding-system-for-read 'binary)))
-               (unless (eq coding-system-for-read 'binary)
+               (when (eq coding-system-for-read 'binary)
                  (set-buffer-multibyte nil)
                  (setq-local buffer-file-coding-system 'binary))
                ,@body))
@@ -245,7 +245,8 @@ special values:
 'read*       -- read all forms in FILE and return it as a list of S-exps.
 '(read . N)  -- read the first N (an integer) S-exps in FILE.
 
-CODING dictates the encoding of the buffer. This defaults to `utf-8'.
+CODING dictates the encoding of the buffer. This defaults to `utf-8'. If set to
+nil, `binary' is used.
 
 If NOERROR is non-nil, don't throw an error if FILE doesn't exist. This will
 still throw an error if FILE is unreadable, however.
@@ -301,18 +302,21 @@ If CONTENTS is list of forms. Any literal strings in the list are inserted
 verbatim, as text followed by a newline, with `insert'. Sexps are inserted with
 `prin1'. BY is the function to use to emit
 
-MODE dictates the permissions of the file. If FILE already exists, its
-permissions will be changed.
+MODE dictates the permissions of created file and directories. MODE is either an
+integer or a cons cell whose car is the mode for files and cdr the mode for
+directories. If FILE already exists, its permissions will be changed. The
+permissions of existing directories will never be changed.
 
 CODING dictates the encoding to read/write with (see `coding-system-for-write').
-If set to nil, `binary' is used.
+This defaults to `utf-8'. If set to nil, `binary' is used.
 
 APPEND dictates where CONTENTS will be written. If neither is set,
 the file will be overwritten. If both are, the contents will be written to both
 ends. Set either APPEND or PREPEND to `noerror' to silently ignore read errors."
-  (doom--with-prepared-file-buffer file coding mode
-    (let ((contents (ensure-list contents))
-          datum)
+  (let ((mode (ensure-list mode))
+        (contents (ensure-list contents))
+        datum)
+    (doom--with-prepared-file-buffer file coding (car mode)
       (while (setq datum (pop contents))
         (cond ((stringp datum)
                (funcall
@@ -325,15 +329,21 @@ ends. Set either APPEND or PREPEND to `noerror' to silently ignore read errors."
               ((let ((standard-output (current-buffer))
                      (print-quoted t)
                      (print-level nil)
-                     (print-length nil))
-                 (funcall printfn datum))))))
-    (let (write-region-annotate-functions
-          write-region-post-annotation-function)
-      (when mkdir
-        (make-directory (file-name-directory buffer-file-name)
-                        (eq mkdir 'parents)))
-      (write-region nil nil buffer-file-name append :silent))
-    buffer-file-name))
+                     (print-length nil)
+                     ;; Escape special chars to avoid any shenanigans
+                     (print-escape-newlines t)
+                     (print-escape-control-characters t)
+                     (print-escape-nonascii t)
+                     (print-escape-multibyte t))
+                 (funcall printfn datum)))))
+      (let (write-region-annotate-functions
+            write-region-post-annotation-function)
+        (when mkdir
+          (with-file-modes (or (cdr mode) (default-file-modes))
+            (make-directory (file-name-directory buffer-file-name)
+                            (eq mkdir 'parents))))
+        (write-region nil nil buffer-file-name append :silent))
+      buffer-file-name)))
 
 ;;;###autoload
 (defmacro with-file-contents! (file &rest body)
