@@ -2,7 +2,6 @@
 
 (use-package! emms
   ;; :defer t
-  ;; :commands (emms)
   :init
   (setq emms-directory (concat doom-data-dir "emms")
         emms-source-playlist-ask-before-overwrite nil ;; for favs
@@ -26,6 +25,7 @@
         emms-player-list '(emms-player-mpd) ;; mpv is too silent
         ;; emms-player-mpv-environment '("PULSE_PROP_media.role=music")
         ;; emms-player-mpv-parameters '("--quiet" "--really-quiet" "--no-audio-display" "--force-window=no" "--vo=xv");; can try --vo=null but does'nt play well at times
+        emms-player-mpv-parameters '("--quiet" "--really-quiet" "--save-position-on-quit" "--no-audio-display")
         emms-browser-thumbnail-small-size 64
         emms-browser-thumbnail-medium-size 128) ;; defaults are too big
 
@@ -111,9 +111,8 @@ _o_: dec        _c_: prev         _R_: repeat all [% s(my/tick-symbol emms-repea
 _v_: sysvol     _a_: seek bw      _#_: shuffle            _s_elect
 _D_: sysvol+    _h_: seek fw      _%_: sort               _g_oto EMMS buffer
 _O_: sysvol-    _SPC_: play/pause _m_: mute/unmute        _f_avorite
-^ ^             _DEL_: restart                            _L_yrics select
+^ ^             _DEL_: restart                            _l_Playlist play
   "
-    ;; ("v" sndio-win-open :exit t)
     ;; ("d" emms-volume-raise) ;; TODO ;; needs fix to work with mpc
     ;; ("o" emms-volume-lower)
     ;; in the meanwhile
@@ -142,10 +141,11 @@ _O_: sysvol-    _SPC_: play/pause _m_: mute/unmute        _f_avorite
     ("g" (progn (emms)
                 (with-current-emms-playlist
                   (emms-playlist-mode-center-current))))
-    ;; ("l" my/emms-current-lyrics :exit t)
     ("f" +emms-add-to-favorites)
-    ("L" my/versuri-select :exit t)
-
+    ;; ("l" (progn (emms-playlist-current-clear)
+    ;;         (call-interactively 'emms-add-playlist)))
+    ;;
+    ("l" (call-interactively 'emms-play-playlist))
     ("q" nil :exit t))
 
 (map! :leader
