@@ -49,7 +49,8 @@ overrides `completion-styles' during company completion sessions.")
           "C-l"   #'vertico-multiform-reverse)
         "M-RET" #'vertico-exit-input
         "C-o"   #'+vertico-quick-embark
-        ;; "M-i"   #'+vertico-quick-insert
+        "C-a"   #'embark-act-with-completing-read
+        "M-i"   #'+vertico-quick-insert
         "C-SPC" #'+vertico/embark-preview
         "C-j"   #'vertico-next
         "DEL"   #' vertico-directory-delete-char
@@ -71,6 +72,7 @@ overrides `completion-styles' during company completion sessions.")
   (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
   (add-hook 'minibuffer-setup-hook #'vertico-repeat-save)
   (map! :map vertico-map "DEL" #'vertico-directory-delete-char)
+  ;; (setq vertico-buffer-display-action 'display-buffer-reuse-window)
 
   ;; These commands are problematic and automatically show the *Completions* buffer
   (advice-add #'tmm-add-prompt :after #'minibuffer-hide-completions)
@@ -388,6 +390,13 @@ orderless."
          :desc "Actions" "a" #'embark-act)) ; to be moved to :config default if accepted
   :config
   (require 'consult)
+
+ (defun +embark-act-with-completing-read (&optional arg)
+   (interactive "P")
+   (let* ((embark-prompter 'embark-completing-read-prompter)
+          (act (propertize "Act" 'face 'highlight))
+          (embark-indicators '(embark-minimal-indicator)))
+     (embark-act arg)))
 
   (set-popup-rule! "^\\*Embark Export:" :size 0.35 :ttl 0 :quit nil)
 
