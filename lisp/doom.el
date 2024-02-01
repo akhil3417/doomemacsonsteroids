@@ -116,9 +116,9 @@
     (push 'dynamic-modules features))
 (if (fboundp #'json-parse-string)
     (push 'jansson features))
-(let ((inhibit-changing-match-data t))
-  (if (string-match "HARFBUZZ" system-configuration-features) ; no alternative
-      (push 'harfbuzz features)))
+(if (string-match-p "HARFBUZZ" system-configuration-features) ; no alternative
+    (push 'harfbuzz features))
+
 ;; The `native-compile' feature exists whether or not it is functional (e.g.
 ;; libgcc is available or not). This seems silly, so pretend it doesn't exist if
 ;; it isn't functional.
@@ -237,7 +237,7 @@ These files should not be shared across systems. By default, it is used by
 
 Data files contain shared and long-lived data that Doom, Emacs, and their
 packages require to function correctly or at all. Deleting them by hand will
-cause breakage, and require user intervention (e.g. a 'doom sync' or 'doom env')
+cause breakage, and require user intervention (e.g. a `doom sync` or `doom env`)
 to restore.
 
 Use this for: server binaries, package source, pulled module libraries,
@@ -254,10 +254,10 @@ For profile-local data files, use `doom-profile-data-dir' instead.")
     (file-name-concat doom-local-dir "cache/"))
   "Where Doom stores its global cache files.
 
-Cache files represent non-essential data that shouldn't be problematic when
+Cache files represent unessential data that shouldn't be problematic when
 deleted (besides, perhaps, a one-time performance hit), lack portability (and so
 shouldn't be copied to other systems/configs), and are regenerated when needed,
-without user input (e.g. a 'doom sync').
+without user input (e.g. a `doom sync`).
 
 Some examples: images/data caches, elisp bytecode, natively compiled elisp,
 session files, ELPA archives, authinfo files, org-persist, etc.
@@ -273,11 +273,11 @@ For profile-local cache files, use `doom-profile-cache-dir' instead.")
     (file-name-concat doom-local-dir "state/"))
   "Where Doom stores its global state files.
 
-State files contain non-essential, unportable, but persistent data which, if
-lost won't cause breakage, but may be inconvenient as they cannot be
-automatically regenerated or restored. For example, a recently-opened file list
-is not essential, but losing it means losing this record, and restoring it
-requires revisiting all those files.
+State files contain unessential, unportable, but persistent data which, if lost
+won't cause breakage, but may be inconvenient as they cannot be automatically
+regenerated or restored. For example, a recently-opened file list is not
+essential, but losing it means losing this record, and restoring it requires
+revisiting all those files.
 
 Use this for: history, logs, user-saved data, autosaves/backup files, known
 projects, recent files, bookmarks.
@@ -331,19 +331,20 @@ users).")
   ;;   `file-remote-p'). You get a noteable boost to startup time by unsetting
   ;;   or simplifying its value.
   (let ((old-value (default-toplevel-value 'file-name-handler-alist)))
-    (setq file-name-handler-alist
-          ;; HACK: If the bundled elisp for this Emacs install isn't
-          ;;   byte-compiled (but is compressed), then leave the gzip file
-          ;;   handler there so Emacs won't forget how to read read them.
-          ;;
-          ;;   calc-loaddefs.el is our heuristic for this because it is built-in
-          ;;   to all supported versions of Emacs, and calc.el explicitly loads
-          ;;   it uncompiled. This ensures that the only other, possible
-          ;;   fallback would be calc-loaddefs.el.gz.
-          (if (eval-when-compile
-                (locate-file-internal "calc-loaddefs.el" load-path))
-              nil
-            (list (rassq 'jka-compr-handler old-value))))
+    (set-default-toplevel-value
+     'file-name-handler-alist
+     ;; HACK: If the bundled elisp for this Emacs install isn't byte-compiled
+     ;;   (but is compressed), then leave the gzip file handler there so Emacs
+     ;;   won't forget how to read read them.
+     ;;
+     ;;   calc-loaddefs.el is our heuristic for this because it is built-in to
+     ;;   all supported versions of Emacs, and calc.el explicitly loads it
+     ;;   uncompiled. This ensures that the only other, possible fallback would
+     ;;   be calc-loaddefs.el.gz.
+     (if (eval-when-compile
+           (locate-file-internal "calc-loaddefs.el" load-path))
+         nil
+       (list (rassq 'jka-compr-handler old-value))))
     ;; Make sure the new value survives any current let-binding.
     (set-default-toplevel-value 'file-name-handler-alist file-name-handler-alist)
     ;; Remember it so it can be reset where needed.
@@ -352,10 +353,11 @@ users).")
     ;;   needed for handling encrypted or compressed files, among other things.
     (add-hook! 'emacs-startup-hook :depth 101
       (defun doom--reset-file-handler-alist-h ()
-        (setq file-name-handler-alist
-              ;; Merge instead of overwrite because there may have been changes to
-              ;; `file-name-handler-alist' since startup we want to preserve.
-              (delete-dups (append file-name-handler-alist old-value))))))
+        (set-default-toplevel-value
+         'file-name-handler-alist
+         ;; Merge instead of overwrite because there may have been changes to
+         ;; `file-name-handler-alist' since startup we want to preserve.
+         (delete-dups (append file-name-handler-alist old-value))))))
 
   (unless noninteractive
     ;; PERF: Resizing the Emacs frame (to accommodate fonts that are smaller or
@@ -409,23 +411,23 @@ users).")
       (define-advice startup--load-user-init-file (:before (&rest _) undo-silence)
         (advice-remove #'load-file #'load-file@silence))
 
-      ;; PERF: `load-suffixes' and `load-file-rep-suffixes' are consulted on each
-      ;;   `require' and `load'. Doom won't load any dmodules this early, so omit
-      ;;   .so for a small startup boost. This is later restored in doom-start.
+      ;; PERF: `load-suffixes' and `load-file-rep-suffixes' are consulted on
+      ;;   each `require' and `load'. Doom won't load any modules this early, so
+      ;;   omit .so for a tiny startup boost. Is later restored in doom-start.
       (put 'load-suffixes 'initial-value (default-toplevel-value 'load-suffixes))
       (put 'load-file-rep-suffixes 'initial-value (default-toplevel-value 'load-file-rep-suffixes))
       (set-default-toplevel-value 'load-suffixes '(".elc" ".el"))
       (set-default-toplevel-value 'load-file-rep-suffixes '(""))
-      ;; COMPAT: Undo any problematic startup optimizations; from this point, I make
-      ;;   no assumptions about what might be loaded in userland.
+      ;; COMPAT: Undo any problematic startup optimizations; from this point, I
+      ;;   make no assumptions about what might be loaded in userland.
       (add-hook! 'doom-before-init-hook
         (defun doom--reset-load-suffixes-h ()
           (setq load-suffixes (get 'load-suffixes 'initial-value)
                 load-file-rep-suffixes (get 'load-file-rep-suffixes 'initial-value))))
 
-      ;; PERF: Doom uses `defcustom' to indicate variables that users are expected
-      ;;   to reconfigure. Trouble is it fires off initializers meant to
-      ;;   accommodate any user attempts to configure them before they were
+      ;; PERF: Doom uses `defcustom' to indicate variables that users are
+      ;;   expected to reconfigure. Trouble is it fires off initializers meant
+      ;;   to accommodate any user attempts to configure them before they were
       ;;   defined. This is unnecessary before $DOOMDIR/init.el is loaded, so I
       ;;   disable them until it is.
       (setq custom-dont-initialize t)
@@ -434,8 +436,8 @@ users).")
           (setq custom-dont-initialize nil)))
 
       ;; PERF: The mode-line procs a couple dozen times during startup. This is
-      ;;   normally quite fast, but disabling the default mode-line and reducing the
-      ;;   update delay timer seems to stave off ~30-50ms.
+      ;;   normally quite fast, but disabling the default mode-line and reducing
+      ;;   the update delay timer seems to stave off ~30-50ms.
       (put 'mode-line-format 'initial-value (default-toplevel-value 'mode-line-format))
       (setq-default mode-line-format nil)
       (dolist (buf (buffer-list))
@@ -444,8 +446,8 @@ users).")
       ;;   produce ugly flashes of unstyled Emacs.
       (setq-default inhibit-redisplay t
                     inhibit-message t)
-      ;; COMPAT: Then reset it with advice, because `startup--load-user-init-file'
-      ;;   will never be interrupted by errors. And if these settings are left
+      ;; COMPAT: Then reset with advice, because `startup--load-user-init-file'
+      ;;   will never be interrupted by errors.  And if these settings are left
       ;;   set, Emacs could appear frozen or garbled.
       (defun doom--reset-inhibited-vars-h ()
         (setq-default inhibit-redisplay nil
@@ -459,8 +461,8 @@ users).")
         (unless (default-toplevel-value 'mode-line-format)
           (setq-default mode-line-format (get 'mode-line-format 'initial-value))))
 
-      ;; PERF: Doom disables the UI elements by default, so that there's less for
-      ;;   the frame to initialize. However, the toolbar is still populated
+      ;; PERF: Doom disables the UI elements by default, so that there's less
+      ;;   for the frame to initialize. However, the toolbar is still populated
       ;;   regardless, so I lazy load it until tool-bar-mode is actually used.
       (advice-add #'tool-bar-setup :override #'ignore)
       (define-advice startup--load-user-init-file (:before (&rest _) defer-tool-bar-setup)
@@ -497,7 +499,7 @@ All valid contexts:
 (put 'doom-context 'valid-values '(cli compile eval init modules packages reload doctor sandbox))
 (put 'doom-context 'risky-local-variable t)
 
-(defun doom-context--check (context)
+(defun doom-context--assert (context)
   (let ((valid (get 'doom-context 'valid-values)))
     (unless (memq context valid)
       (signal 'doom-context-error
@@ -512,7 +514,7 @@ All valid contexts:
 
 Return non-nil if successful. Throws an error if CONTEXT is invalid."
   (unless (memq context doom-context)
-    (doom-context--check context)
+    (doom-context--assert context)
     (doom-log ":context: +%s %s" context doom-context)
     (push context doom-context)))
 
@@ -529,7 +531,7 @@ wasn't active when this was called."
     (setq doom-context (delq context doom-context))))
 
 (defmacro doom-context-with (contexts &rest body)
-  "Evaluate BODY with CONTEXT added to `doom-context'."
+  "Evaluate BODY with CONTEXTS added to `doom-context'."
   (declare (indent 1))
   `(let ((doom-context doom-context))
      (dolist (context (ensure-list ,contexts))
