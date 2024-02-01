@@ -1,5 +1,6 @@
 ;;; tools/gptel/autoload/autoload.el -*- lexical-binding: t; -*-
 
+;;;###autoload
 (defcustom gemini-api-key #'gptel-api-key-from-auth-source
   "An API key (string) for the Gemini backend.
 
@@ -10,6 +11,7 @@ key (more secure) for the active backend."
           (string :tag "API key")
           (function :tag "Function that returns the API key")))
 
+;;;###autoload
 (defcustom anyscale-api-key #'gptel-api-key-from-auth-source
   "An API key (string) for the Anyscale backend.
 
