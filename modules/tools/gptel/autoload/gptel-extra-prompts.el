@@ -64,6 +64,6 @@
                               )))))
     (setq-local gptel--system-message (nth 2 (assoc directive-key gptel-directives)))))
 
-(setq gptel-directives (+gptel-build-directives(concat doom-cache-dir "AIPIHKAL/system-prompts/")))
+(setq gptel-directives (+gptel-build-directives(concat doom-local-dir "straight/repos/AIPIHKAL/system-prompts/")))
 
 (provide 'gptel-extras-prompts)
