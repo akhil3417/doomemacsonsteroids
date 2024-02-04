@@ -95,11 +95,19 @@ See `+emacs-lisp-non-package-mode' for details.")
              ;; Ensure straight sees modifications to installed packages
              #'+emacs-lisp-init-straight-maybe-h)
 
-  ;; UX: Flycheck's two emacs-lisp checkers produce a *lot* of false positives
-  ;;   in non-packages (like Emacs configs or elisp scripts), so I disable
-  ;;   `emacs-lisp-checkdoc' and set `byte-compile-warnings' to a subset of the
-  ;;   original in the flycheck instance (see `+emacs-lisp-linter-warnings').
-  (add-hook 'flycheck-mode-hook #'+emacs-lisp-non-package-mode)
+  ;; UX: Both Flycheck's and Flymake's two emacs-lisp checkers produce a *lot*
+  ;;    of false positives in non-packages (like Emacs configs or elisp
+  ;;    scripts), so I disable `checkdoc' (`emacs-lisp-checkdoc',
+  ;;    `elisp-flymake-checkdoc') and set `byte-compile-warnings' to a subset
+  ;;    that makes more sense (see `+emacs-lisp-linter-warnings')
+  (add-hook! '(flycheck-mode-hook flymake-mode-hook) #'+emacs-lisp-non-package-mode)
+
+  (defadvice! +syntax--fix-elisp-flymake-load-path (orig-fn &rest args)
+    "Set load path for elisp byte compilation Flymake backend"
+    :around #'elisp-flymake-byte-compile
+    (let ((elisp-flymake-byte-compile-load-path
+           (append elisp-flymake-byte-compile-load-path load-path)))
+      (apply orig-fn args)))
 
   ;; Enhance elisp syntax highlighting, by highlighting Doom-specific
   ;; constructs, defined symbols, and truncating :pin's in `package!' calls.
