@@ -507,7 +507,7 @@ relative to `org-directory', unless it is an absolute path."
    "file" :face (lambda (path)
                   (if (or (file-remote-p path)
                           ;; filter out network shares on windows (slow)
-                          (if IS-WINDOWS (string-prefix-p "\\\\" path))
+                          (if (featurep :system 'windows) (string-prefix-p "\\\\" path))
                           (file-exists-p path))
                       'org-link
                     '(warning org-link))))
@@ -519,6 +519,7 @@ relative to `org-directory', unless it is an absolute path."
             '("google"      . "https://google.com/search?q=")
             '("gimages"     . "https://google.com/images?q=%s")
             '("gmap"        . "https://maps.google.com/maps?q=%s")
+            '("kagi"        . "https://kagi.com/search?q=%s")
             '("duckduckgo"  . "https://duckduckgo.com/?q=%s")
             '("wikipedia"   . "https://en.wikipedia.org/wiki/%s")
             '("wolfram"     . "https://wolframalpha.com/input/?i=%s")
@@ -931,7 +932,7 @@ between the two."
         [C-return]   #'+org/insert-item-below
         [C-S-return] #'+org/insert-item-above
         [C-M-return] #'org-insert-subheading
-        (:when IS-MAC
+        (:when (featurep :system 'macos)
          [s-return]   #'+org/insert-item-below
          [s-S-return] #'+org/insert-item-above
          [s-M-return] #'org-insert-subheading)
@@ -1352,7 +1353,7 @@ between the two."
       ))
 
   ;;; Custom org modules
-  (dolist (flag (doom-module-context-get 'flags))
+  (dolist (flag (doom-module-context-get :flags))
     (load! (concat "contrib/" (substring (symbol-name flag) 1)) nil t))
 
   ;; Add our general hooks after the submodules, so that any hooks the
@@ -1391,7 +1392,7 @@ between the two."
     "Advise `server-visit-files' to load `org-protocol' lazily."
     :around #'server-visit-files
     (if (not (cl-loop with protocol =
-                      (if IS-WINDOWS
+                      (if (featurep :system 'windows)
                           ;; On Windows, the file arguments for `emacsclient'
                           ;; get funnelled through `expand-file-path' by
                           ;; `server-process-filter'. This substitutes

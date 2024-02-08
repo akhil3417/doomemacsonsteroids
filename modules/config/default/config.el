@@ -81,7 +81,7 @@
 
 
 ;;;###package tramp
-(unless IS-WINDOWS
+(unless (featurep :system 'windows)
   (setq tramp-default-method "ssh")) ; faster than the default scp
 
 
@@ -300,7 +300,7 @@ Continues comments if executed from a commented line. Consults
   (define-key tabulated-list-mode-map "q" #'quit-window))
 
 ;; OS specific fixes
-(when IS-MAC
+(when (featurep :system 'macos)
   ;; Fix MacOS shift+tab
   (define-key key-translation-map [S-iso-lefttab] [backtab])
   ;; Fix conventional OS keys in Emacs
@@ -524,11 +524,11 @@ Continues comments if executed from a commented line. Consults
         :gi "C-S-RET"       #'+default/newline-above
         :gn [C-S-return]    #'+default/newline-above
 
-        (:when IS-MAC
-          :gn "s-RET"        #'+default/newline-below
-          :gn [s-return]     #'+default/newline-below
-          :gn "S-s-RET"      #'+default/newline-above
-          :gn [S-s-return]   #'+default/newline-above)))
+        (:when (featurep :system 'macos)
+         :gn "s-RET"        #'+default/newline-below
+         :gn [s-return]     #'+default/newline-below
+         :gn "S-s-RET"      #'+default/newline-above
+         :gn [S-s-return]   #'+default/newline-above)))
 
 
 ;;

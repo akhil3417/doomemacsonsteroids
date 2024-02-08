@@ -415,7 +415,7 @@ Otherwise, falls back on `find-file-at-point'."
   (if (equal major-mode 'pdf-view-mode)
       (setq identifier (car (pdf-view-active-region-text))))
   (message "Looking up dictionary definition for %S" identifier)
-  (cond ((and IS-MAC (require 'osx-dictionary nil t))
+  (cond ((and (featurep :system 'macos) (require 'osx-dictionary nil t))
          (osx-dictionary--view-result identifier))
         ((and +lookup-dictionary-prefer-offline
               (require 'wordnut nil t))

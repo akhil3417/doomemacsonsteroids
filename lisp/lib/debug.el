@@ -260,7 +260,8 @@ ready to be pasted in a bug report on github."
                              (bound-and-true-p emacs-repository-branch)
                              (and (stringp emacs-repository-version)
                                   (substring emacs-repository-version 0 9))
-                             (symlink-path doom-emacs-dir))))
+                             (format "EMACSDIR=%s" (symlink-path doom-emacs-dir))
+                             (format "EMACS=%s" (expand-file-name invocation-name invocation-directory)))))
         (doom . ,(list doom-version
                        (if doom-profile
                            (format "PROFILE=%s@%s"
@@ -300,7 +301,7 @@ ready to be pasted in a bug report on github."
                             'compiled-user-config)
                         (if (doom-files-in doom-core-dir :type 'files :match "\\.elc$")
                             'compiled-core)
-                        (if (doom-files-in doom-modules-dirs :type 'files :match "\\.elc$")
+                        (if (doom-files-in doom-module-load-path :type 'files :match "\\.elc$")
                             'compiled-modules)))))
         (custom
          ,@(when (and (stringp custom-file)
