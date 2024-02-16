@@ -27,6 +27,18 @@ This has no effect on the +onsave flag, apheleia will always be used there.")
 (defvaralias '+format-with 'apheleia-formatter
   "Set this to explicitly use a certain formatter for the current buffer.")
 
+(defvar +format-functions
+  '(+format-in-org-src-blocks-fn
+    +format-with-lsp-fn
+    +format-with-eglot-fn)
+  "A list of functions to run when formatting a buffer or region.
+
+Each function is given three arguments: the starting point, end point, and a
+symbol indicating the type of operation being requested (as a symbol: either
+`region' or `buffer').
+
+The first function to return non-nil will abort all functions after it,
+including Apheleia itself.")
 
 ;;
 ;;; Bootstrap
