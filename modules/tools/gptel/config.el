@@ -136,12 +136,6 @@
   :key 'gemini-api-key
   :stream t))
 
-(gptel-make-openai "kaggle-notebook-api"
-  :host ""
-  :key ""
- :stream t                            ; Stream responses
-  :protocol "https")
-
 ;; Anyscale offers an OpenAI compatible API
 (setq-default gptel-backend (gptel-make-openai "Anyscale")
               gptel-model   "mistralai/Mixtral-8x7B-Instruct-v0.1")

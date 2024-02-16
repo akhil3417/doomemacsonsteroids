@@ -8,5 +8,4 @@
 
 (when (modulep! +aipihkal)
 (package! AIPIHKAL
- :recipe (:host github :repo "gregoryg/AIPIHKAL"
-          :files ("system-prompts/*.md")))) ;who would have thought
+ :recipe (:host github :repo "akhil3417/AIPIHKAL")))
