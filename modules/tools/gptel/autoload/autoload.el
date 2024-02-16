@@ -1,5 +1,5 @@
 ;;; tools/gptel/autoload/autoload.el -*- lexical-binding: t; -*-
-
+;;;###if (modulep! +gemini)
 ;;;###autoload
 (defcustom gemini-api-key #'gptel-api-key-from-auth-source
   "An API key (string) for the Gemini backend.

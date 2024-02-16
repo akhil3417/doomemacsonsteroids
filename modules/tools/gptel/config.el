@@ -131,9 +131,10 @@
 
   )
 
+(when (featurep! +gemini)
 (gptel-make-gemini "Gemini"
   :key 'gemini-api-key
-  :stream t)
+  :stream t))
 
 (gptel-make-openai "kaggle-notebook-api"
   :host ""
