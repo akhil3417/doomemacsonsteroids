@@ -137,6 +137,19 @@
   :stream t))
 
 ;; Anyscale offers an OpenAI compatible API
+(when (featurep! +togetherai)
+(gptel-make-openai "TogetherAI"
+  :host "api.together.xyz"
+  :key 'togetherai-api-key
+  :stream t
+  :models '(;; have listed the best once, check together.ai for more
+            "deepseek-ai/deepseek-coder-33b-instruct"
+            "mistralai/Mixtral-8x7B-Instruct-v0.1"
+            ;; "prompthero/openjourney"
+            ;; "stabilityai/stable-diffusion-xl-base-1.0"
+            "Qwen/Qwen1.5-72B")))
+
+;; Anyscale offers an OpenAI compatible API
 (setq-default gptel-backend (gptel-make-openai "Anyscale")
               gptel-model   "mistralai/Mixtral-8x7B-Instruct-v0.1")
 (setq-default

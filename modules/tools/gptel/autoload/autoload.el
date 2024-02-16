@@ -21,3 +21,14 @@ key (more secure) for the active backend."
   :type '(choice
           (string :tag "API key")
           (function :tag "Function that returns the API key")))
+
+;;;###autoload
+(defcustom togetherai-api-key #'gptel-api-key-from-auth-source
+  "An API key (string) for the Together.ai backend.
+
+Can also be a function of no arguments that returns an API
+key (more secure) for the active backend."
+  :group 'gptel
+  :type '(choice
+          (string :tag "API key")
+          (function :tag "Function that returns the API key")))
