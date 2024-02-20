@@ -97,6 +97,15 @@
   (defun +gptel-eshell-keys ()
     (define-key eshell-mode-map (kbd "C-c <return>") #'+gptel-eshell-send)))
 
+(map! :leader
+      (:prefix-map ("l" . "LLM")
+       :desc "Send text to model" "RET" #'gptel-send
+       :desc "Send text to model with arguments" "l" #'gptel-menu
+       :desc "Send text to model with arguments" "s" #'gptel-menu
+       :desc "Abort query" "x" #'gptel-abort
+       :desc "Chat buffer" "c" #'gptel))
+(map! :leader :prefix "o" :desc "LLM Chat buffer" :n "c" #'gptel)
+
 (when (featurep! +localapi)
   (gptel-make-gpt4all
    "GPT4All"                              ;Name of your choosing
