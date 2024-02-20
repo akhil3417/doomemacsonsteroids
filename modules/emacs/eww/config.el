@@ -5,7 +5,8 @@
   :config
   (add-hook! 'eww-after-render-hook #'eww--rename-buffer)
   (when (featurep! +shrface)
-  (add-hook 'eww-after-render-hook #'shrface-mode))
+    (add-hook 'eww-after-render-hook (lambda () (org-indent-mode -1))) ; NOTE 2024-02-20: https://github.com/chenyanming/shrface/issues/22
+    (add-hook 'eww-after-render-hook #'shrface-mode))
   (defadvice! eww-rename-buffer-a ()
     :after #'eww-back-url
     :after #'eww-forward-url
