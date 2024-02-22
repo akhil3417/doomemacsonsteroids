@@ -146,23 +146,8 @@
   :stream t))
 
 ;; Anyscale offers an OpenAI compatible API
-(when (featurep! +togetherai)
-(gptel-make-openai "TogetherAI"
-  :host "api.together.xyz"
-  :key 'togetherai-api-key
-  :stream t
-  :models '(;; have listed the best once, check together.ai for more
-            "deepseek-ai/deepseek-coder-33b-instruct"
-            "mistralai/Mixtral-8x7B-Instruct-v0.1"
-            ;; "prompthero/openjourney"
-            ;; "stabilityai/stable-diffusion-xl-base-1.0"
-            "Qwen/Qwen1.5-72B")))
-
-;; Anyscale offers an OpenAI compatible API
-(setq-default gptel-backend (gptel-make-openai "Anyscale")
-              gptel-model   "mistralai/Mixtral-8x7B-Instruct-v0.1")
-(setq-default
-   gptel-backend (gptel-make-openai
+(when (featurep! +anyscale)
+(gptel-make-openai
 	"Anyscale"
 	:host "api.endpoints.anyscale.com"
 	:header (lambda () `(("Authorization" . ,(concat "Bearer " (gptel--get-api-key)))))
@@ -170,5 +155,20 @@
         :stream t                            ; Stream responses
 	:models '("mistralai/Mixtral-8x7B-Instruct-v0.1"
 			 "meta-llama/Llama-2-70b-chat-hf"
-			 "codellama/CodeLlama-34b-Instruct-hf"))
-  gptel-model "mistralai/Mixtral-8x7B-Instruct-v0.1")
+			 "codellama/CodeLlama-34b-Instruct-hf")))
+
+;; TogetherAI offers an OpenAI compatible API
+(when (featurep! +togetherai)
+  (setq-default
+   gptel-backend(gptel-make-openai "TogetherAI"
+                  :host "api.together.xyz"
+                  :key 'togetherai-api-key
+                  :stream t
+                  :models '(;; have listed the best once, check together.ai for more
+                            "deepseek-ai/deepseek-coder-33b-instruct"
+                            "mistralai/Mixtral-8x7B-Instruct-v0.1"
+                            ;; "prompthero/openjourney"
+                            ;; "stabilityai/stable-diffusion-xl-base-1.0"
+                            "Qwen/Qwen1.5-72B")))
+  gptel-model "deepseek-ai/deepseek-coder-33b-instruct")
+
