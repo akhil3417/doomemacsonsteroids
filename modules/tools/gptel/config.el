@@ -31,7 +31,10 @@
   (add-hook 'gptel-pre-response-hook '+gptel-easy-page)
   ;; (add-hook 'gptel-post-response-functions 'gptel-end-of-response)
   ;; (add-hook 'gptel-post-stream-hook 'gptel-auto-scroll)
-  (set-popup-rules! '(("^\\*Anyscale*" :slot 2 :side right :size 60 :select t :quit nil :ttl t)))
+  (set-popup-rules!
+     '(("^\\*Anyscale*" :slot 1 :side right :size 60 :select t :quit nil :ttl t)
+       ("^\\*TogetherAI*" :slot 2 :side right :size 60 :select t :quit nil :ttl t)
+       ("^\\*gemini*" :slot 3 :side right :size 60 :select t :quit nil :ttl t)))
 
   (setf (alist-get 'org-mode gptel-response-prefix-alist)
         "*Response*: ")
