@@ -233,6 +233,7 @@ we have to clean it up ourselves."
         dired-omit-files
         (concat dired-omit-files
                 "\\|^\\.DS_Store\\'"
+                "\\|^flycheck_.*"
                 "\\|^\\.project\\(?:ile\\)?\\'"
                 "\\|^\\.\\(?:svn\\|git\\)\\'"
                 "\\|^\\.ccls-cache\\'"

@@ -126,7 +126,7 @@ the requested feature."
 
 ;;;###autoload
 (defun +format-in-org-src-blocks-fn (beg end _op)
-  "TODO"
+  "Reformat org src blocks with apheleia as if they were independent buffers."
   (when (derived-mode-p 'org-mode)
     (goto-char beg)
     (while (re-search-forward org-babel-src-block-regexp end t)
@@ -138,8 +138,8 @@ the requested feature."
                           (goto-char (org-element-property :end element))
                           (skip-chars-backward " \t\n")
                           (line-beginning-position)))
-             (beg (if beg (max beg block-beg) block-beg))
-             (end (if end (min end block-end) block-end))
+             (beg (max beg block-beg))
+             (end (min end block-end))
              (lang (org-element-property :language element))
              (major-mode (org-src-get-lang-mode lang)))
         (save-excursion
@@ -152,4 +152,5 @@ the requested feature."
                 (unless formatter
                   (user-error "No formatter configured for language: %s" lang)))
               (let ((apheleia-formatter formatter))
-                (+format-region beg end)))))))))
+                (+format-region beg end)))))))
+    t))
