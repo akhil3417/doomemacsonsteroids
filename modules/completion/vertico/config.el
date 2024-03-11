@@ -390,12 +390,12 @@ orderless."
   :config
   (require 'consult)
 
- (defun +embark-act-with-completing-read (&optional arg)
-   (interactive "P")
-   (let* ((embark-prompter 'embark-completing-read-prompter)
-          (act (propertize "Act" 'face 'highlight))
-          (embark-indicators '(embark-minimal-indicator)))
-     (embark-act arg)))
+  (defun +embark-act-with-completing-read (&optional arg)
+    (interactive "P")
+    (let* ((embark-prompter 'embark-completing-read-prompter)
+           (act (propertize "Act" 'face 'highlight))
+           (embark-indicators '(embark-minimal-indicator)))
+      (embark-act arg)))
 
   (set-popup-rule! "^\\*Embark Export:" :size 0.35 :ttl 0 :quit nil)
 
@@ -470,33 +470,43 @@ orderless."
   :config
   (add-hook 'doom-after-reload-hook #'posframe-delete-all))
 
+;; From https://github.com/minad/vertico/wiki#candidate-display-transformations-custom-candidate-highlighting
+;;
+;; Uses `add-face-text-property' instead of `propertize' unlike the above snippet
+;; because `'append' is necessary to not override the match font lock
+;; See: https://github.com/minad/vertico/issues/389
+(use-package! vertico-multiform
+  :hook (vertico-mode . vertico-multiform-mode)
+  :config
+  (defvar +vertico-transform-functions nil)
 
-;; The problem this solves is that when you try to open an media file
-;; using find-file in Emacs, it would typically open the file in a
-;; text buffer rather than launching a media player to play the
-;; video. By adding the ak/find-file-handler function as advice to
-;; find-file, it intercepts the file opening process and checks if
-;; the file being opened has an MP4 extension. If it does, it starts
-;; a new mpv process to play the video file instead of opening it in
-;; a text buffer.
+  (cl-defmethod vertico--format-candidate :around
+    (cand prefix suffix index start &context ((not +vertico-transform-functions) null))
+    (dolist (fun (ensure-list +vertico-transform-functions))
+      (setq cand (funcall fun cand)))
+    (cl-call-next-method cand prefix suffix index start))
 
-;; (defvar ak/media-player "mpv"
-;;   "The media player to open media files.")
+  (defun +vertico-highlight-directory (file)
+    "If FILE ends with a slash, highlight it as a directory."
+    (when (string-suffix-p "/" file)
+      (add-face-text-property 0 (length file) 'marginalia-file-priv-dir 'append file))
+    file)
 
-;; (defvar ak/media-players
-;;   (cl-loop for ext in '("mp4" "mkv" "webm" "avi" "flv" "mov" "wmv" "m4b""mp3" "opus" "wav" "ogg")
-;;            collect (cons ext ak/media-player)))
+  (defun +vertico-highlight-enabled-mode (cmd)
+    "If MODE is enabled, highlight it as font-lock-constant-face."
+    (let ((sym (intern cmd)))
+      (with-current-buffer (nth 1 (buffer-list))
+        (if (or (eq sym major-mode)
+                (and
+                 (memq sym minor-mode-list)
+                 (boundp sym)
+                 (symbol-value sym)))
+            (add-face-text-property 0 (length cmd) 'font-lock-constant-face 'append cmd)))
+      cmd))
 
-;; (defun ak/find-file-handler (orig-fun &rest args)
-;;   "Open media files with the associated media player based on file extension."
-;;   (let ((file (expand-file-name (car args))))
-;;     (if (and (stringp file)
-;;              (file-regular-p file))
-;;         (let* ((file-ext (downcase (file-name-extension file)))
-;;                (media-player (cdr (assoc file-ext ak/media-players))))
-;;           (if media-player
-;;               (start-process "ak/file-handler" nil media-player file)
-;;             (apply orig-fun args)))
-;;       (apply orig-fun args))))
-
-;; (advice-add #'find-file :around #'ak/find-file-handler)
+  (add-to-list 'vertico-multiform-categories
+               '(file
+                 (+vertico-transform-functions . +vertico-highlight-directory)))
+  (add-to-list 'vertico-multiform-commands
+               '(execute-extended-command
+                 (+vertico-transform-functions . +vertico-highlight-enabled-mode))))
