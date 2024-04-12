@@ -26,7 +26,7 @@ This must be set before `treemacs' has loaded.")
         treemacs-persist-file (concat doom-cache-dir "treemacs-persist")
         treemacs-last-error-persist-file (concat doom-cache-dir "treemacs-last-error-persist"))
   :config
-  ;; Don't follow the cursor
+  ;; Don't follow the cursor (it's more disruptive/jarring than helpful as a default)
   (treemacs-follow-mode -1)
 
   (set-popup-rule! "^ ?\\*Treemacs" :ignore t)
@@ -84,6 +84,7 @@ This must be set before `treemacs' has loaded.")
   :after treemacs
   :config (treemacs-set-scope-type 'Perspectives))
 
+
 (use-package! lsp-treemacs
   :when (modulep! +lsp)
-  :after (treemacs lsp))
+  :after treemacs)

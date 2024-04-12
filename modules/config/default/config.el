@@ -461,39 +461,44 @@ Continues comments if executed from a commented line. Consults
   (map! :when (modulep! :completion corfu)
         :after corfu
         (:map corfu-map
-              [return] #'corfu-insert
-              "RET" #'corfu-insert
-              "C-s" #'+corfu-move-to-minibuffer
+              [remap corfu-insert-separator] #'+corfu-smart-sep-toggle-escape
+              "C-S-s" #'+corfu-move-to-minibuffer
               "C-p" #'corfu-previous
               "C-n" #'corfu-next
-              (:when (modulep! :completion corfu +orderless)
-                "<remap> <completion-at-point>" #'+corfu-smart-sep-toggle-escape)
-              (:when (modulep! :completion corfu +tng)
-                [tab] #'corfu-next
-                "TAB" #'corfu-next
-                [backtab] #'corfu-previous
-                "S-TAB" #'corfu-previous))
-        (:after corfu-popupinfo
-         :map corfu-popupinfo-map
-         "C-<up>" #'corfu-popupinfo-scroll-down
-         "C-<down>" #'corfu-popupinfo-scroll-up
-         "C-S-p" #'corfu-popupinfo-scroll-down
-         "C-S-n" #'corfu-popupinfo-scroll-up
-         "C-S-u" (cmd! (funcall-interactively #'corfu-popupinfo-scroll-down corfu-popupinfo-min-height))
-         "C-S-d" (cmd! (funcall-interactively #'corfu-popupinfo-scroll-up corfu-popupinfo-min-height)))
-        (:map corfu-map
-         :gi "C-<return>" '(menu-item "Conclude the minibuffer" exit-minibuffer
-                            :enable (active-minibuffer-window))
-         :gi "S-<return>" '(menu-item "Insert completion and conclude" +corfu-complete-and-exit-minibuffer
-                            :enable (active-minibuffer-window))))
-  (when-let ((cmds-del (and (modulep! :completion corfu +tng)
-                            (cmds! (and (> corfu--index -1)
-                                        (eq corfu-preview-current 'insert))
-                                   #'corfu-reset))))
-    (map! :after corfu
+              "S-TAB" #'corfu-previous
+              [backtab] #'corfu-previous
+              "TAB" #'corfu-next
+              [tab] #'corfu-next))
+  (let ((cmds-del
+         `(menu-item "Reset completion" corfu-reset
+           :filter ,(lambda (cmd)
+                      (when (and (>= corfu--index 0)
+                                 (eq corfu-preview-current 'insert))
+                        cmd))))
+        (cmds-ret
+         `(menu-item "Insert completion DWIM" corfu-insert
+           :filter ,(lambda (cmd)
+                      (interactive)
+                      (cond ((null +corfu-want-ret-to-confirm)
+                             (corfu-quit)
+                             nil)
+                            ((eq +corfu-want-ret-to-confirm 'minibuffer)
+                             (funcall-interactively cmd)
+                             nil)
+                            ((and (or (not (minibufferp nil t))
+                                      (eq +corfu-want-ret-to-confirm t))
+                                  (>= corfu--index 0))
+                             cmd)
+                            ((or (not (minibufferp nil t))
+                                 (eq +corfu-want-ret-to-confirm t))
+                             nil)
+                            (t cmd))))))
+    (map! :when (modulep! :completion corfu)
           :map corfu-map
           [backspace] cmds-del
-          "DEL" cmds-del))
+          "DEL" cmds-del
+          :gi [return] cmds-ret
+          :gi "RET" cmds-ret))
 
   ;; Smarter C-a/C-e for both Emacs and Evil. C-a will jump to indentation.
   ;; Pressing it again will send you to the true bol. Same goes for C-e, except
@@ -525,10 +530,10 @@ Continues comments if executed from a commented line. Consults
         :gn [C-S-return]    #'+default/newline-above
 
         (:when (featurep :system 'macos)
-         :gn "s-RET"        #'+default/newline-below
-         :gn [s-return]     #'+default/newline-below
-         :gn "S-s-RET"      #'+default/newline-above
-         :gn [S-s-return]   #'+default/newline-above)))
+          :gn "s-RET"        #'+default/newline-below
+          :gn [s-return]     #'+default/newline-below
+          :gn "S-s-RET"      #'+default/newline-above
+          :gn [S-s-return]   #'+default/newline-above)))
 
 
 ;;
