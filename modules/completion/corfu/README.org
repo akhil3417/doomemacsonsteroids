@@ -67,19 +67,19 @@ characters, by means of [[kbd:][C-SPC]] at any moment or [[kbd:][TAB]] on a line
 indentation. Many styles of completion are documented below, which can be
 composed to suit the user. The following keybindings are generally available:
 
-| Keybind         | Description                                |
-|-----------------+--------------------------------------------|
-| [[kbd:][C-n]]   | Go to next candidate                       |
-| [[kbd:][C-p]]   | Go to previous candidate                   |
-| [[kbd:][C-S-n]] | Go to next doc line                        |
-| [[kbd:][C-S-p]] | Go to previous doc line                    |
-| [[kbd:][C-S-s]] | Export to minibuffer                       |
-| [[kbd:][TAB]]   | (when not completing) Indent or complete   |
-| [[kbd:][C-SPC]] | (when not completing) Complete             |
-| [[kbd:][C-u]]   | (evil) Go to next candidate page           |
-| [[kbd:][C-d]]   | (evil) Go to previous candidate page       |
-| [[kbd:][C-h]]   | (evil) Toggle documentation (if available) |
-| [[kbd:][M-t]]   | (emacs) (when not completing) Complete     |
+| Keybind | Description                                |
+|---------+--------------------------------------------|
+| [[kbd:][C-n]]     | Go to next candidate                       |
+| [[kbd:][C-p]]     | Go to previous candidate                   |
+| [[kbd:][C-S-n]]   | Go to next doc line                        |
+| [[kbd:][C-S-p]]   | Go to previous doc line                    |
+| [[kbd:][C-S-s]]   | Export to minibuffer                       |
+| [[kbd:][TAB]]     | (when not completing) Indent or complete   |
+| [[kbd:][C-SPC]]   | (when not completing) Complete             |
+| [[kbd:][C-u]]     | (evil) Go to next candidate page           |
+| [[kbd:][C-d]]     | (evil) Go to previous candidate page       |
+| [[kbd:][C-h]]     | (evil) Toggle documentation (if available) |
+| [[kbd:][M-t]]     | (emacs) (when not completing) Complete     |
 
 Bindings in the following sections are additive, and unless otherwise noted, are
 enabled by default with configurable behavior. Additionally, for users of evil,
@@ -113,17 +113,17 @@ one selected, for instance. Then, you have to move one candidate backwards to
 pass-through The exact action of [[kbd:][RET]] can be changed via
 [[var:+corfu-want-ret-to-confirm]].
 
-| Keybind       | Description           |
-|---------------+-----------------------|
-| [[kbd:][RET]] | Insert candidate DWIM |
+| Keybind | Description           |
+|---------+-----------------------|
+| [[kbd:][RET]]     | Insert candidate DWIM |
 
 ** Cycle directionally
 If you'd rather think in directions rather than next/previous, arrow keys and vi
 movements to control the selection and documentation view are bound by default.
 You may unbind them by setting to nil, see ~map!~'s documentation.
 
-| Keybind            | Description                     |
-|--------------------+---------------------------------|
+| Keybind  | Description                     |
+|----------+---------------------------------|
 | [[kbd:][<down>]]   | Go to next candidate            |
 | [[kbd:][<up>]]     | Go to previous candidate        |
 | [[kbd:][C-j]]      | (evil) Go to next candidate     |
@@ -136,10 +136,10 @@ You may unbind them by setting to nil, see ~map!~'s documentation.
 ** Cycle with [[kbd:][TAB]]
 [[kbd:][TAB]]-based cycling alternatives are also bound according to the table below:
 
-| Keybind         | Description              |
-|-----------------+--------------------------|
-| [[kbd:][TAB]]   | Go to next candidate     |
-| [[kbd:][S-TAB]] | Go to previous candidate |
+| Keybind | Description              |
+|---------+--------------------------|
+| [[kbd:][TAB]]     | Go to next candidate     |
+| [[kbd:][S-TAB]]   | Go to previous candidate |
 
 ** Searching with multiple keywords (~+orderless~)
 If the [[doom-module::completion corfu +orderless]] flag is enabled, users can
@@ -154,12 +154,12 @@ backslash, including the space in the search term, and pressing it with an
 already escaped separator before point deletes it. Thus, you can cycle back if
 you accidentaly press more than needed.
 
-| Keybind         | Description                                     |
-|-----------------+-------------------------------------------------|
-| [[kbd:][C-SPC]] | (evil) (when completing) Insert separator DWIM  |
-| [[kbd:][M-SPC]] | (emacs) (when completing) Insert separator DWIM |
-| [[kbd:][SPC]]   | (when completing) Quit autocompletion           |
-| [[kbd:][SPC]]   | (when completing with separators) Self-insert   |
+| Keybind | Description                                     |
+|---------+-------------------------------------------------|
+| [[kbd:][C-SPC]]   | (evil) (when completing) Insert separator DWIM  |
+| [[kbd:][M-SPC]]   | (emacs) (when completing) Insert separator DWIM |
+| [[kbd:][SPC]]     | (when completing) Quit autocompletion           |
+| [[kbd:][SPC]]     | (when completing with separators) Self-insert   |
 
 ** Exporting to the minibuffer
 The entries shown in the completion popup can be exported to a ~completing-read~
@@ -186,10 +186,6 @@ A few variables may be set to change behavior of this module:
 - [[var:corfu-auto-prefix]] ::
   Number of characters till auto-completion starts to happen. Defaults to 2.
 - [[var:corfu-on-exact-match]] ::
-<<<<<<< HEAD
-  Configures behavior for exact matches. Its default is nil, and it's
-  recommended to leave it at that. Otherwise, single matches on snippet keys
-  expand immediately.
   Configures behavior for exact matches.
 - [[var:corfu-preselect]] ::
   Configures startup selection, choosing between the first candidate or the
@@ -225,15 +221,6 @@ To add other CAPFs on a mode-per-mode basis, put either of the following in your
 (add-hook 'some-mode-hook (lambda () (add-hook 'completion-at-point-functions #'some-capf depth t)))
 #+end_src
 
-<<<<<<< HEAD
-~DEPTH~ above is an integer between -100, 100, and defaults to 0 of omitted.  Also
-see ~add-hook!~'s documentation for additional ways to call it. ~add-hook~ only
-accepts the quoted arguments form above.
-<<<<<<< HEAD
->>>>>>> pullreqs/37
-=======
->>>>>>> pullreqs/38
-=======
 ~DEPTH~ above is an integer between -100, 100, and defaults to 0 if nil. Also
 see ~add-hook!~'s documentation for additional ways to call it. ~add-hook~ only
 accepts the quoted arguments form above.
@@ -250,15 +237,10 @@ It's okay to add to the mode directly because ~completion-at-point~ works
 regardless of Corfu (the latter is an enhanced UI for the former). Just note not
 all CAPFs are interactive to be called this way, in which case you can use
 [[doom-package:cape]]'s adapter to enable this.
->>>>>>> pullreqs/43
 
 * Troubleshooting
 [[doom-report:][Report an issue?]]
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> pullreqs/43
 If you have performance issues with ~cape-dabbrev~, the first thing I recommend
 doing is to look at the list of buffers Dabbrev is scanning:
 
@@ -270,12 +252,6 @@ doing is to look at the list of buffers Dabbrev is scanning:
 ... and modify ~dabbrev-ignored-buffer-regexps~ or ~dabbrev-ignored-buffer-modes~
 accordingly.
 
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> pullreqs/37
-=======
->>>>>>> pullreqs/38
-=======
 If you see garbage completion candidates, you can use the following command to
 debug the issue:
 
@@ -292,7 +268,6 @@ debug the issue:
 (search-in-dabbrev-buffers "\342\200\231")
 #+end_src
 
->>>>>>> pullreqs/43
 * Frequently asked questions
 /This module has no FAQs yet./ [[doom-suggest-faq:][Ask one?]]
 
